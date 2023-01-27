@@ -1,0 +1,113 @@
+// ignore_for_file: use_build_context_synchronously, unused_result
+
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../components/big_button.dart';
+import '../components/loading_layer.dart';
+import '../components/snackbar.dart';
+import 'providers/my_profile_provider.dart';
+import 'providers/write_profile_notifier_provider.dart';
+
+class WriteProfilePage extends HookConsumerWidget {
+  const WriteProfilePage({super.key});
+
+  static const route = "/write-profile";
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final media = MediaQuery.of(context);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final style = theme.textTheme;
+    final model = ref.watch(writeProfileNotifierProvider);
+
+    void done({bool skip = false}) async {
+      try {
+        await model.write(skip: skip);
+        ref.refresh(myProfileProvider);
+      } catch (e) {
+        AppSnackbar(context).error(e);
+      }
+    }
+
+    // final formKey = useRef(GlobalKey<FormState>());
+    return LoadingLayer(
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: false,
+          // title: Text(),
+          actions: [
+            // LangButton(),
+            TextButton(
+              onPressed: () => done(skip: true),
+              child: const Text("Skip"),
+            ),
+          ],
+          title: const Text("Add Profile Picture"),
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: BigButton(
+              onPressed: model.file != null ? done : null,
+              label: "SAVE",
+            ),
+          ),
+        ),
+        body: SafeArea(
+          child: Center(
+            child: GestureDetector(
+              onTap: () async {
+                // final file = await MyFiles.pickAndCrop();
+                // if (file != null) {
+                //   model.file = file;
+                // }
+              },
+              child: CircleAvatar(
+                backgroundImage:
+                    model.file != null ? FileImage(model.file!) : null,
+                backgroundColor: scheme.primaryContainer,
+                foregroundColor: scheme.primary,
+                radius: media.size.width / 4,
+                child: model.file==null? const Icon(
+                  Icons.add_rounded,
+                  size: 62,
+                ):null,
+              ),
+            ),
+          ),
+        ),
+        // bottomNavigationBar: SafeArea(
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(16).copyWith(top: 0),
+        //     child: MaterialButton(
+        //       textColor: scheme.onSecondaryContainer,
+        //       color: scheme.secondaryContainer,
+        //       child: Text(labels.save.toUpperCase()),
+        //       onPressed: () async {
+        //         if (formKey.value.currentState!.validate()) {
+        //           formKey.value.currentState!.save();
+        //           model.write();
+        //           Navigator.pushNamedAndRemoveUntil(
+        //               context, Root.route, (route) => false);
+        //         }
+        //       },
+        //     ),
+        //   ),
+        // ),
+        // body: SingleChildScrollView(
+        //   padding: const EdgeInsets.all(16),
+        //   child: Form(
+        //     key: formKey.value,
+        //     child: Column(
+        //       crossAxisAlignment: CrossAxisAlignment.start,
+        //       children: [
+
+        //       ],
+        //     ),
+        //   ),
+        // ),
+      ),
+    );
+  }
+}

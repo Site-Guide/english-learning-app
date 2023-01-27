@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "272696026835",
+    "project_id": "engexpert-app",
+    "storage_bucket": "engexpert-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272696026835:android:765f5b27646abe63f01626",
+        "android_client_info": {
+          "package_name": "com.engexpert.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "272696026835-lg6kqflm31u836lcjdtisegjoue7ifc4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.engexpert.app",
+            "certificate_hash": "b5f76d868d7822c5497fae07d93a1ad68bcf3caa"
+          }
+        },
+        {
+          "client_id": "272696026835-kj9454anmnejpugiq0k1i7aoficoqpel.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAPPt8dMWo6xNYmNZ4cpqqsxegBiLAjSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "272696026835-kj9454anmnejpugiq0k1i7aoficoqpel.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "272696026835-0mqjlma057r20qd0ahb5jbc08tq2j4ue.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.engexpert.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
