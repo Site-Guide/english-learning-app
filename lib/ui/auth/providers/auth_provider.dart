@@ -111,7 +111,7 @@ class Auth extends ChangeNotifier {
 
   Future<void> sendEmail() async {
     try {
-      await _auth.createVerification(url: "http://engexpert.in/");
+      await _auth.createVerification(url: "https://engexpert.vercel.app");
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -140,9 +140,23 @@ class Auth extends ChangeNotifier {
 
   Future<void> signInWithGoogle() async {
     try {
-       await _auth.createOAuth2Session(provider: 'google');
+      await _auth.createOAuth2Session(provider: 'google');
       await Future.delayed(const Duration(milliseconds: 500));
       _ref.refresh(userProvider);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return Future.error(e);
+    }
+  }
+
+  Future<void> sendResetLink() async {
+    try {
+      await _auth.createRecovery(
+        email: email,
+        url: "https://engexpert.vercel.app/reset-password",
+      );
     } catch (e) {
       if (kDebugMode) {
         print(e);

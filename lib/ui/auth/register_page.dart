@@ -26,7 +26,10 @@ class RegisterPage extends ConsumerWidget {
     final height = MediaQuery.of(context).size.height;
     return LoadingLayer(
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text(Labels.appName),
+        ),
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(

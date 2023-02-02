@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:english/ui/auth/reset_password_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -29,133 +30,142 @@ class LoginPage extends ConsumerWidget {
     final model = ref.read(authProvider);
     return LoadingLayer(
       child: Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      Labels.signIn,
-                      style: styles.headlineLarge,
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      initialValue: model.email,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.email_outlined),
-                        labelText: Labels.email,
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text(Labels.appName),
+        ),
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        Labels.signIn,
+                        style: styles.headlineLarge,
                       ),
-                      onChanged: (v) => model.email = v,
-                      validator: Validators.email,
-                    ),
-                    const SizedBox(height: 16),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        ref.watch(
-                            provider.select((value) => value.obscurePassword));
-                        return TextFormField(
-                          obscureText: model.obscurePassword,
-                          initialValue: model.password,
-                          decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.lock_outline_rounded),
-                            labelText: Labels.password,
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                model.obscurePassword = !model.obscurePassword;
-                              },
-                              icon: Icon(model.obscurePassword
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        initialValue: model.email,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.email_outlined),
+                          labelText: Labels.email,
+                        ),
+                        onChanged: (v) => model.email = v,
+                        validator: Validators.email,
+                      ),
+                      const SizedBox(height: 16),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          ref.watch(
+                              provider.select((value) => value.obscurePassword));
+                          return TextFormField(
+                            obscureText: model.obscurePassword,
+                            initialValue: model.password,
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.lock_outline_rounded),
+                              labelText: Labels.password,
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  model.obscurePassword = !model.obscurePassword;
+                                },
+                                icon: Icon(model.obscurePassword
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                              ),
                             ),
-                          ),
-                          onChanged: (v) => model.password = v,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        ref.watch(provider);
-                        return MaterialButton(
-                          disabledColor: scheme.surfaceVariant,
-                          textColor: scheme.onPrimary,
-                          color: scheme.primary,
-                          // padding: const EdgeInsets.all(16),
-                          onPressed: model.email.isNotEmpty &&
-                                  model.password.isNotEmpty
-                              ? () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    try {
-                                      await model.login();
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.pushReplacementNamed(
-                                        context,
-                                        Root.route,
-                                      );
-                                    } catch (e) {
-                                      AppSnackbar(context).error(e);
+                            onChanged: (v) => model.password = v,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          ref.watch(provider);
+                          return MaterialButton(
+                            disabledColor: scheme.surfaceVariant,
+                            textColor: scheme.onPrimary,
+                            color: scheme.primary,
+                            // padding: const EdgeInsets.all(16),
+                            onPressed: model.email.isNotEmpty &&
+                                    model.password.isNotEmpty
+                                ? () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      try {
+                                        await model.login();
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          Root.route,
+                                        );
+                                      } catch (e) {
+                                        AppSnackbar(context).error(e);
+                                      }
                                     }
                                   }
-                                }
-                              : null,
-                          child: Text(Labels.signIn.toUpperCase()),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        text: Labels.dontHaveAnAccount,
-                        style: styles.bodyLarge,
-                        children: [
-                          TextSpan(
-                              text: Labels.signUp,
-                              style: styles.button!.copyWith(
-                                  fontSize: styles.bodyLarge!.fontSize,
-                                  color: scheme.primary),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  Navigator.pushReplacementNamed(
-                                      context, RegisterPage.route);
-                                }),
-                        ],
+                                : null,
+                            child: Text(Labels.signIn.toUpperCase()),
+                          );
+                        },
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      Labels.or,
-                      style: styles.bodySmall,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: scheme.onPrimary,
-                        foregroundColor: scheme.primary,
+                      const SizedBox(height: 24),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          text: Labels.dontHaveAnAccount,
+                          style: styles.bodyLarge,
+                          children: [
+                            TextSpan(
+                                text: Labels.signUp,
+                                style: styles.button!.copyWith(
+                                    fontSize: styles.bodyLarge!.fontSize,
+                                    color: scheme.primary),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.pushReplacementNamed(
+                                        context, RegisterPage.route);
+                                  }),
+                          ],
+                        ),
                       ),
-                      onPressed: () async {
-                        await model.signInWithGoogle();
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, Root.route, (route) => false);
-                      },
-                      label: const Text(
-                      Labels.signInWithGoogle
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, ResetPasswordPage.route);
+                        },
+                        child: const Text(Labels.forgotPassword),
                       ),
-                      icon: Image.asset(
-                        Assets.google,
-                        height: 24,
-                        width: 24,
+                      const SizedBox(height: 24),
+                      Text(
+                        Labels.or,
+                        style: styles.bodySmall,
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: scheme.onPrimary,
+                          foregroundColor: scheme.primary,
+                        ),
+                        onPressed: () async {
+                          await model.signInWithGoogle();
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, Root.route, (route) => false);
+                        },
+                        label: const Text(Labels.signInWithGoogle),
+                        icon: Image.asset(
+                          Assets.google,
+                          height: 24,
+                          width: 24,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

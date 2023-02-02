@@ -40,8 +40,6 @@ class _EmailVerifyPageState extends ConsumerState<EmailVerifyPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-
-    WidgetsBinding.instance.addObserver(this);
     if (state == AppLifecycleState.resumed) {
       ref.refresh(userProvider);
     }

@@ -23,9 +23,16 @@ class Labels {
   static const String email = "Email";
   // static const String emailNotVerifiedYet = "Email not verified yet!";
   static const String enterValidEmail = "Enter valid email";
+    static const String enterYourRegisteredEmail =
+      "Enter your registered email below to receive password reset instruction";
+  static const String forgotPassword = "Forgot Password?";
+    static const String forgotYourPassword = "Forgot your password?";
+
   static const String heyThere =
       "Hey there! You need to update the app to access latest features 🆕📲";
   static const String later = "Later";
+    static const String login = "Login";
+
   static const String missmatchPassword = "Mismatch Password!";
   static const String myProfile = "My Profile";
 
@@ -34,9 +41,11 @@ class Labels {
   static const String or = "OR";
   static const String password = "Password";
   static const String pickImage = "Pick Image";
+  static const String rememberPassword = "Remember password?";
 
   static const String resend = "RESEND";
   static const String retry = "Retry";
+  static const String sendResetLink = "Send Reset Link";
 
   // static const String required = "Required";
   static const String signIn = "Sign In";

@@ -1,3 +1,4 @@
+import 'package:english/ui/auth/reset_password_page.dart';
 import 'package:flutter/material.dart';
 import 'auth/register_page.dart';
 import 'root.dart';
@@ -13,6 +14,9 @@ class AppRouter {
 
       case SplashPage.route:
         selectedPage = const SplashPage();
+        break;
+        case ResetPasswordPage.route:
+        selectedPage = const ResetPasswordPage();
         break;
       default:
         selectedPage = const Root();
