@@ -3,16 +3,11 @@
 import 'dart:async';
 
 import 'package:english/ui/home/widgets/home_view.dart';
-import 'package:english/utils/extensions.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../../config.dart';
 import '../../cores/providers/links_provider.dart';
-import '../../cores/providers/master_data_provider.dart';
-import '../components/force_update_dialog.dart';
-import '../courses/widgets/course_card.dart';
 import '../profile/profile_page.dart';
 
 class HomePage extends StatefulHookConsumerWidget {
@@ -80,39 +75,62 @@ class _HomePageState extends ConsumerState<HomePage>
     final index = useState(0);
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+
+    final list = [
+      'assets/home.png',
+      'assets/open-book.png',
+      'assets/chat.png',
+      'assets/user.png',
+    ];
+
     return Scaffold(
-      bottomNavigationBar: Theme(
-        data: theme.copyWith(
-          colorScheme: scheme.copyWith(
-            secondaryContainer: scheme.primaryContainer,
-          ),
-        ),
-        child: NavigationBar(
-          backgroundColor: scheme.surface,
-          surfaceTintColor: scheme.surface,
-          onDestinationSelected: (v) {
-            index.value = v;
-          },
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              label: "Home",
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.group),
-              label: "Practice",
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.chat_bubble_outline_rounded),
-              label: "Chat",
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline_rounded),
-              label: "Profile",
-            ),
-          ],
-          selectedIndex: index.value,
-        ),
+      // bottomNavigationBar: NavigationBar(
+      //   backgroundColor: scheme.surface,
+      //   surfaceTintColor: scheme.surface,
+      //   onDestinationSelected: (v) {
+      //     index.value = v;
+      //   },
+      //   destinations: const [
+      //     NavigationDestination(
+      //       icon: Icon(Icons.home_outlined),
+      //       label: "Home",
+      //     ),
+      //     NavigationDestination(
+      //       icon: Icon(Icons.group),
+      //       label: "Practice",
+      //     ),
+      //     NavigationDestination(
+      //       icon: Icon(Icons.chat_bubble_outline_rounded),
+      //       label: "Chat",
+      //     ),
+      //     NavigationDestination(
+      //       icon: Icon(Icons.person_outline_rounded),
+      //       label: "Profile",
+      //     ),
+      //   ],
+      //   selectedIndex: index.value,
+      // ),
+      // backgroundColor: ,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: index.value,
+        selectedItemColor: scheme.secondary,
+        unselectedItemColor: scheme.secondary.withOpacity(0.4),
+        onTap: (value) {
+          index.value = value;
+        },
+        type: BottomNavigationBarType.fixed,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: list
+            .map(
+              (e) => BottomNavigationBarItem(
+                icon: ImageIcon(
+                  AssetImage(e),
+                ),
+                label: '',
+              ),
+            )
+            .toList(),
       ),
       body: [
         const HomeView(),

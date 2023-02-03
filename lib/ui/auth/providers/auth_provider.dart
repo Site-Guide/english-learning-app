@@ -142,7 +142,7 @@ class Auth extends ChangeNotifier {
     try {
       await _auth.createOAuth2Session(provider: 'google');
       await Future.delayed(const Duration(milliseconds: 500));
-      _ref.refresh(userProvider);
+      await _ref.refresh(userProvider.future);
     } catch (e) {
       if (kDebugMode) {
         print(e);

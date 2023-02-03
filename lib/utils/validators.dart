@@ -5,6 +5,10 @@ import 'labels.dart';
 class Validators {
   static String? required(String? v) =>
       v == null || v.isEmpty ? "Required" : null;
+
+  
+  static String? password(String? v) => required(v)?? (v!.length < 6 ? "Password must be at least 6 characters" : null);
+
   static String? email(String? v) =>
       required(v) ??
       (!EmailValidator.validate(v!) ? Labels.enterValidEmail : null);

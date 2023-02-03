@@ -1,5 +1,7 @@
 // ignore_for_file: unused_result
 
+import 'package:english/ui/components/app_button.dart';
+import 'package:english/ui/components/app_outline_button.dart';
 import 'package:english/utils/assets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,14 +36,15 @@ class _EmailVerifyPageState extends ConsumerState<EmailVerifyPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      ref.refresh(userProvider);
+      Future.delayed(const Duration(milliseconds: 100)).then((value) {
+        ref.refresh(userProvider);
+      });
     }
   }
 
@@ -54,16 +57,32 @@ class _EmailVerifyPageState extends ConsumerState<EmailVerifyPage>
     final email = ref.read(userProvider).value!.email;
     return Scaffold(
       appBar: AppBar(
-        title: Text(Labels.verifyYouEmail),
+        title: const Text(Labels.verifyYouEmail),
         actions: [
-          IconButton(
-            onPressed: () async {
+          PopupMenuButton(
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  value: '',
+                  child: Row(
+                    children: const [
+                      Icon(
+                        Icons.logout,
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Logout'),
+                    ],
+                  ),
+                ),
+              ];
+            },
+            onSelected: (value) async {
+              print('/');
               await model.logout();
               onDone();
             },
-            icon: const Icon(Icons.logout_outlined),
-          ),
-          
+          )
         ],
       ),
       body: Padding(
@@ -85,38 +104,32 @@ class _EmailVerifyPageState extends ConsumerState<EmailVerifyPage>
               ),
             ),
             Spacer(),
-            Center(
-              child: MaterialButton(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                color: scheme.primary,
-                textColor: scheme.onPrimary,
-                onPressed: () async {
-                  ref.refresh(userProvider);
-                },
-                child: const Text(Labels.done),
-              ),
+            AppButton(
+           
+              onPressed: () async {
+               final v = await  ref.refresh(userProvider.future);
+               if(!v.emailVerification){
+                // ignore: use_build_context_synchronously
+                AppSnackbar(context).error('Your email not verfied yet!');
+               }
+              },
+              label: 'Done',
             ),
             const SizedBox(height: 16),
-            Center(
-              child: TextButton.icon(
-                onPressed: () async {
-                  try {
-                    await model.sendEmail();
-                    // ignore: use_build_context_synchronously
-                    AppSnackbar(context)
-                        .message(Labels.verificationEmailResent);
-                  } catch (e) {
-                    if (kDebugMode) {
-                      print(e);
-                    }
+            AppOutlinedButton(
+              onPressed: () async {
+                try {
+                  await model.sendEmail();
+                  // ignore: use_build_context_synchronously
+                  AppSnackbar(context)
+                      .message(Labels.verificationEmailResent);
+                } catch (e) {
+                  if (kDebugMode) {
+                    print(e);
                   }
-                },
-                icon: const Icon(Icons.restart_alt_rounded),
-                label: const Text(Labels.resend),
-              ),
+                }
+              },
+              label: 'Resend email',
             ),
             const Spacer(),
           ],

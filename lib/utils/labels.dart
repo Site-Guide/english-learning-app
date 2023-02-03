@@ -24,7 +24,7 @@ class Labels {
   // static const String emailNotVerifiedYet = "Email not verified yet!";
   static const String enterValidEmail = "Enter valid email";
     static const String enterYourRegisteredEmail =
-      "Enter your registered email below to receive password reset instruction";
+      "Enter your registered email below to receive password reset link";
   static const String forgotPassword = "Forgot Password?";
     static const String forgotYourPassword = "Forgot your password?";
 

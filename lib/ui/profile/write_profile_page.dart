@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, unused_result
 
+import 'package:english/ui/components/app_button.dart';
 import 'package:english/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,28 +43,19 @@ class WriteProfilePage extends HookConsumerWidget {
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
           appBar: AppBar(
-            centerTitle: false,
-            // title: Text(),
-            actions: [
-              // LangButton(),
-              TextButton(
-                onPressed: () => done(skip: true),
-                child: const Text("Skip"),
-              ),
-            ],
             title: const Text("Enter your details"),
           ),
           bottomNavigationBar: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: BigButton(
+              child: AppButton(
                 onPressed: model.enabled ? done : null,
                 label: "SAVE",
               ),
             ),
           ),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(24.0),
             child: Form(
               key: formKey.value,
               child: Column(
@@ -73,7 +65,6 @@ class WriteProfilePage extends HookConsumerWidget {
                     "Phone Number",
                     style: style.bodyLarge,
                   ),
-                  const SizedBox(height: 8.0),
                   TextFormField(
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
@@ -87,15 +78,13 @@ class WriteProfilePage extends HookConsumerWidget {
                       LengthLimitingTextInputFormatter(10),
                     ],
                   ),
-                  const SizedBox(height: 16.0),
+                  const SizedBox(height: 24.0),
                   Text(
                     "Whatsapp Number",
                     style: style.bodyLarge,
                   ),
-                  const SizedBox(height: 8.0),
                   TextFormField(
-                                        keyboardType: TextInputType.number,
-
+                    keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                       prefixText: "+91 ",
                     ),
@@ -107,7 +96,7 @@ class WriteProfilePage extends HookConsumerWidget {
                       LengthLimitingTextInputFormatter(10),
                     ],
                   ),
-                  const SizedBox(height: 16.0),
+                  const SizedBox(height: 24.0),
                   Text(
                     "Are you a:",
                     style: style.bodyLarge,

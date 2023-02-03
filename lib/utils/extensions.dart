@@ -18,13 +18,13 @@ extension Typee on String {
 extension BoxDeco on BoxDecoration {
   BoxDecoration card(ColorScheme scheme) => copyWith(
         color: scheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: scheme.onSurface.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+          // BoxShadow(
+          //   color: scheme.onSurface.withOpacity(0.1),
+          //   blurRadius: 8,
+          //   offset: const Offset(0, 4),
+          // ),
         ],
       );
 }

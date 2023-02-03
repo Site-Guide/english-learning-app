@@ -5,6 +5,8 @@ import 'package:english/utils/extensions.dart';
 import 'package:english/utils/labels.dart';
 import 'package:flutter/material.dart';
 
+import '../components/app_button.dart';
+
 class CoursePage extends StatelessWidget {
   const CoursePage({super.key});
 
@@ -17,81 +19,53 @@ class CoursePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('30 Day Journal Challenge...'),
       ),
-      // bottomNavigationBar: SafeArea(
-      //   child: Padding(
-      //     padding: const EdgeInsets.all(16).copyWith(
-      //       top: 0,
-      //     ),
-      //     child: BigButton(
-      //       label: '${Labels.rs}999 ~ Buy now',
-      //       onPressed: () {},
-      //     ),
-      //   ),
-      // ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16).copyWith(
-            top: 0,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '${Labels.rs}999',
-                  style: style.headlineMedium,
-                ),
-              ),
-              Expanded(
-                child: MaterialButton(
-                  padding: const EdgeInsets.all(16),
-                  color: scheme.primary,
-                  textColor: scheme.onPrimary,
-                  child: Text('Buy now'),
-                  onPressed: () {},
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
       body: ListView(
-        padding: EdgeInsets.all(8),
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset('assets/img.jpg', fit: BoxFit.cover),
-                    Center(
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.play_circle_outline_outlined,
-                          color: Colors.white,
-                          size: 48,
-                        ),
-                      ),
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset('assets/image1.webp', fit: BoxFit.cover),
+                Center(
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.play_circle_outline_outlined,
+                      color: Colors.white,
+                      size: 48,
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
           Container(
             decoration: BoxDecoration().card(scheme),
             margin: const EdgeInsets.all(8),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(8),
                   child: Text(
                     '30 Day Journal Challenge - Establish a Habit of Daily Journaling',
                     style: style.titleMedium,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    '${Labels.rs}3,499',
+                    style: style.headlineMedium!
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: AppButton(
+                    label: 'ENROLL',
+                    onPressed: () {},
                   ),
                 ),
                 const Divider(height: 0.5),

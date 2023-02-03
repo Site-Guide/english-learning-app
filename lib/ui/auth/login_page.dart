@@ -1,6 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:english/ui/auth/reset_password_page.dart';
+import 'package:english/ui/auth/widgets/google_button.dart';
+import 'package:english/ui/components/app_button.dart';
+import 'package:english/ui/components/app_outline_button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -32,77 +36,76 @@ class LoginPage extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: const Text(Labels.appName),
+          title: const Text('Welcome back'),
         ),
         body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        Labels.signIn,
-                        style: styles.headlineLarge,
-                      ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        initialValue: model.email,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.email_outlined),
-                          labelText: Labels.email,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Email',
+                    style: styles.bodyLarge,
+                  ),
+                  // const SizedBox(height: 8),
+                  TextFormField(
+                    initialValue: model.email,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.email_outlined),
+                        hintText: 'you@example.com'),
+                    onChanged: (v) => model.email = v,
+                    validator: Validators.email,
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Password',
+                    style: styles.bodyLarge,
+                  ),
+                  // const SizedBox(height: 8),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      ref.watch(
+                          provider.select((value) => value.obscurePassword));
+                      return TextFormField(
+                        obscureText: model.obscurePassword,
+                        initialValue: model.password,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.lock_outline_rounded),
+                          hintText: 'at least 6 characters',
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              model.obscurePassword = !model.obscurePassword;
+                            },
+                            icon: Icon(model.obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined),
+                          ),
                         ),
-                        onChanged: (v) => model.email = v,
-                        validator: Validators.email,
-                      ),
-                      const SizedBox(height: 16),
-                      Consumer(
-                        builder: (context, ref, child) {
-                          ref.watch(
-                              provider.select((value) => value.obscurePassword));
-                          return TextFormField(
-                            obscureText: model.obscurePassword,
-                            initialValue: model.password,
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock_outline_rounded),
-                              labelText: Labels.password,
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  model.obscurePassword = !model.obscurePassword;
-                                },
-                                icon: Icon(model.obscurePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined),
-                              ),
-                            ),
-                            onChanged: (v) => model.password = v,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      Consumer(
-                        builder: (context, ref, child) {
-                          ref.watch(provider);
-                          return MaterialButton(
-                            disabledColor: scheme.surfaceVariant,
-                            textColor: scheme.onPrimary,
-                            color: scheme.primary,
-                            // padding: const EdgeInsets.all(16),
-                            onPressed: model.email.isNotEmpty &&
-                                    model.password.isNotEmpty
+                        onChanged: (v) => model.password = v,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 32),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      ref.watch(provider);
+                      return AppButton(
+                        
+                        onPressed:
+                            model.email.isNotEmpty && model.password.isNotEmpty
                                 ? () async {
                                     if (_formKey.currentState!.validate()) {
                                       try {
                                         await model.login();
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.pushReplacementNamed(
+                                        Navigator.pushNamedAndRemoveUntil(
                                           context,
                                           Root.route,
+                                          (route) => false,
                                         );
                                       } catch (e) {
                                         AppSnackbar(context).error(e);
@@ -110,63 +113,45 @@ class LoginPage extends ConsumerWidget {
                                     }
                                   }
                                 : null,
-                            child: Text(Labels.signIn.toUpperCase()),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          text: Labels.dontHaveAnAccount,
-                          style: styles.bodyLarge,
-                          children: [
-                            TextSpan(
-                                text: Labels.signUp,
-                                style: styles.button!.copyWith(
-                                    fontSize: styles.bodyLarge!.fontSize,
-                                    color: scheme.primary),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.pushReplacementNamed(
-                                        context, RegisterPage.route);
-                                  }),
-                          ],
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, ResetPasswordPage.route);
-                        },
-                        child: const Text(Labels.forgotPassword),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        Labels.or,
-                        style: styles.bodySmall,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: scheme.onPrimary,
-                          foregroundColor: scheme.primary,
-                        ),
-                        onPressed: () async {
-                          await model.signInWithGoogle();
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, Root.route, (route) => false);
-                        },
-                        label: const Text(Labels.signInWithGoogle),
-                        icon: Image.asset(
-                          Assets.google,
-                          height: 24,
-                          width: 24,
-                        ),
-                      ),
-                    ],
+                        label: Labels.signIn.toUpperCase(),
+                      );
+                    },
                   ),
-                ),
+                  const SizedBox(height: 24),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      text: Labels.dontHaveAnAccount,
+                      style: styles.bodyLarge,
+                      children: [
+                        TextSpan(
+                            text: Labels.signUp,
+                            style: styles.bodyLarge!.copyWith(
+                              color: scheme.primary,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                Navigator.pushReplacementNamed(
+                                    context, RegisterPage.route);
+                              }),
+                      ],
+                    ),
+                  ),
+                  CupertinoButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, ResetPasswordPage.route);
+                    },
+                    child: const Text(Labels.forgotPassword),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    Labels.or,
+                    style: styles.bodySmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  GoogleButton()
+                ],
               ),
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:english/ui/auth/login_page.dart';
 import 'package:english/ui/onboarding/onboarding_page.dart';
+import 'package:english/ui/welcome/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -17,10 +18,7 @@ class Root extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cache = ref.read(cacheProvider).value!;
-    final seen = cache.getBool(Constants.seen) ?? false;
-    return !seen
-        ? const OnboardingPage()
-        : ref.watch(userProvider).when(
+    return  ref.watch(userProvider).when(
               data: (user) => user.emailVerification
                   ? ref.watch(myProfileProvider).when(
                         data: (profile) => const HomePage(),
@@ -38,7 +36,7 @@ class Root extends ConsumerWidget {
                         ),
                       )
                   : const EmailVerifyPage(),
-              error: (e, s) => LoginPage(),
+              error: (e, s) => const WelcomePage(),
               loading: () => const Scaffold(
                 body: Center(
                   child: CircularProgressIndicator(),

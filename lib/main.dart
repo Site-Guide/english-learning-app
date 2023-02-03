@@ -1,5 +1,6 @@
 import 'package:english/utils/labels.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -68,11 +69,14 @@ class MyApp extends StatelessWidget {
             ),
       ),
       theme: ThemeData(
-        scaffoldBackgroundColor: lightColorScheme.surfaceVariant,
+        scaffoldBackgroundColor: lightColorScheme.surface,
         extensions: [lightCustomColors],
-        appBarTheme:  const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
+        appBarTheme:  AppBarTheme(
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            color: lightColorScheme.onSurface
+          ),
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarIconBrightness: Brightness.dark,
             statusBarColor: Colors.transparent,
@@ -81,12 +85,15 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         colorScheme: lightColorScheme,
         useMaterial3: true,
-        dividerTheme: DividerThemeData(
-          color: lightColorScheme.surfaceVariant
+        dividerTheme: DividerThemeData(color: lightColorScheme.surfaceVariant),
+        inputDecorationTheme: InputDecorationTheme(
+          // border: OutlineInputBorder(),
+          hintStyle: TextStyle(
+            color: lightColorScheme.onSurface.withOpacity(0.5),
+          ),
         ),
-        inputDecorationTheme: const InputDecorationTheme(
-          border: OutlineInputBorder(),
-        ),
+        cupertinoOverrideTheme:
+            CupertinoThemeData(primaryColor: lightColorScheme.secondary),
         cardTheme: const CardTheme(clipBehavior: Clip.antiAlias),
         buttonTheme: const ButtonThemeData(
           shape: StadiumBorder(),
@@ -96,8 +103,8 @@ class MyApp extends StatelessWidget {
               displayMedium: const TextStyle(fontWeight: FontWeight.bold),
               headlineLarge: const TextStyle(fontWeight: FontWeight.bold),
               titleLarge: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+                  // fontWeight: FontWeight.bold,
+                  ),
               titleMedium: const TextStyle(
                 fontWeight: FontWeight.w600,
               ),
