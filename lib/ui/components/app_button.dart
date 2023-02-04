@@ -12,8 +12,8 @@ class AppButton extends StatelessWidget {
     final style = theme.textTheme;
     return MaterialButton(
       disabledColor: scheme.onSurface.withOpacity(0.12),
-      color: scheme.primary,
-      textColor: scheme.onPrimary,
+      color: scheme.primaryContainer,
+      textColor: scheme.onPrimaryContainer,
       padding: const EdgeInsets.all(16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -22,7 +22,7 @@ class AppButton extends StatelessWidget {
       child: Text(
         label,
         style: style.titleMedium!.copyWith(
-          color: scheme.onPrimary,
+          color: scheme.onPrimaryContainer,
         ),
       ),
     );

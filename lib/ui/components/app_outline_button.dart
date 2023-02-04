@@ -13,12 +13,14 @@ class AppOutlinedButton extends StatelessWidget {
     final style = theme.textTheme;
     final scheme = theme.colorScheme;
     final buttonStyle = OutlinedButton.styleFrom(
-        padding: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        side: BorderSide(color: scheme.primary),
-        textStyle: style.titleMedium);
+      padding: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      side: BorderSide(color: scheme.secondary),
+      textStyle: style.titleMedium,
+      foregroundColor: scheme.secondary,
+    );
 
     return icon != null
         ? OutlinedButton.icon(

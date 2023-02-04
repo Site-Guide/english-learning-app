@@ -93,7 +93,7 @@ class HomeView extends HookConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CircleAvatar(
-                            backgroundColor: scheme.tertiaryContainer,
+                            backgroundColor: scheme.primaryContainer,
                             child: Icon(
                               Icons.play_arrow_rounded,
                               size: 32,
