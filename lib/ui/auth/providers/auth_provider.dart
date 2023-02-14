@@ -70,7 +70,7 @@ class Auth extends ChangeNotifier {
         email: email,
         password: password,
       );
-      _ref.refresh(userProvider);
+      await _ref.refresh(userProvider.future);
       _loading.end();
     } on AppwriteException catch (e) {
       print(e.code);
@@ -95,8 +95,9 @@ class Auth extends ChangeNotifier {
         email: email,
         password: password,
       );
-      _ref.refresh(userProvider);
       sendEmail();
+
+      await _ref.refresh(userProvider.future);
       _loading.end();
     } on AppwriteException catch (e) {
       _loading.stop();

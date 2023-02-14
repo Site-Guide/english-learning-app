@@ -52,6 +52,8 @@ dependencies:
   shared_preferences: ^2.0.16
   share_plus: ^6.3.0
   google_sign_in: ^5.4.3
+  jitsi_meet_wrapper: ^0.0.6
+  webview_flutter: ^4.0.2
 
   
 dev_dependencies:

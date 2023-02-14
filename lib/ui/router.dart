@@ -1,6 +1,7 @@
 import 'package:english/ui/auth/get_started_page.dart';
 import 'package:english/ui/auth/login_page.dart';
 import 'package:english/ui/auth/reset_password_page.dart';
+import 'package:english/ui/meet/meet_init_page.dart';
 import 'package:flutter/material.dart';
 import 'auth/register_page.dart';
 import 'root.dart';
@@ -24,6 +25,9 @@ class AppRouter {
         break;
       case ResetPasswordPage.route:
         selectedPage = const ResetPasswordPage();
+        break;
+      case MeetInitPage.route:
+        selectedPage = const MeetInitPage();
         break;
       default:
         selectedPage = const Root();

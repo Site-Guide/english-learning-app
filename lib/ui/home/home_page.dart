@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:english/ui/home/widgets/home_view.dart';
+import 'package:english/ui/meet/meet_init_page.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -19,7 +20,7 @@ class HomePage extends StatefulHookConsumerWidget {
 
 class _HomePageState extends ConsumerState<HomePage>
     with WidgetsBindingObserver {
-  late StreamSubscription<PendingDynamicLinkData> linkSubscription;
+  // late StreamSubscription<PendingDynamicLinkData> linkSubscription;
 
   FirebaseDynamicLinks get _links => ref.read(linksProvider);
 
@@ -50,7 +51,7 @@ class _HomePageState extends ConsumerState<HomePage>
 
   @override
   void dispose() {
-    linkSubscription.cancel();
+    // linkSubscription.cancel();
     super.dispose();
   }
 
@@ -135,7 +136,8 @@ class _HomePageState extends ConsumerState<HomePage>
       body: [
         const HomeView(),
         const Scaffold(),
-        const Scaffold(),
+        //  WebMeet(),
+        MeetInitPage(),
         const ProfilePage(),
       ][index.value],
     );

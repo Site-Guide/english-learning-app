@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 extension Crim on String? {
   String? crim() {
@@ -13,6 +14,10 @@ extension Crim on String? {
 extension Typee on String {
   String get types => split('-').first;
   String get type => split('-').last;
+}
+
+extension Date on DateTime {
+  String get date => DateFormat('dd-MM-yyyy').format(this);
 }
 
 extension BoxDeco on BoxDecoration {

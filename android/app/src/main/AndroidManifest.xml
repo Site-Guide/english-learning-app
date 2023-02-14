@@ -1,9 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.english">
+    package="com.example.english"
+     xmlns:tools="http://schemas.android.com/tools">
+
    <application
+   tools:replace="android:label"
         android:label="Engexpert"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        >
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -25,8 +30,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-                <activity android:name="com.linusu.flutter_web_auth_2.CallbackActivity" 
-        android:exported="true">
+        <activity android:name="com.linusu.flutter_web_auth_2.CallbackActivity" 
+             android:exported="true">
             <intent-filter android:label="flutter_web_auth_2">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

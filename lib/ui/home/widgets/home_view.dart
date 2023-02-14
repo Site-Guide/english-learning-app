@@ -1,10 +1,14 @@
+import 'package:english/cores/providers/master_data_provider.dart';
+import 'package:english/ui/components/async_widget.dart';
+import 'package:english/ui/home/providers/topic_provider.dart';
+import 'package:english/ui/home/widgets/timing_view.dart';
+import 'package:english/ui/meet/meet_init_page.dart';
 import 'package:english/ui/packages/package_page.dart';
 import 'package:english/utils/extensions.dart';
+import 'package:english/utils/formats.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import '../../courses/course_page.dart';
 
 class HomeView extends HookConsumerWidget {
   const HomeView({super.key});
@@ -34,6 +38,77 @@ class HomeView extends HookConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.only(bottom: kToolbarHeight + 16),
         children: [
+          AsyncWidget(
+            value: ref.watch(masterDataProvider),
+            data: (data) {
+              return AsyncWidget(
+                value: ref.watch(topicProvider),
+                data: (topic) => topic != null && data.activeSlots.isNotEmpty
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.all(16).copyWith(bottom: 8),
+                            child: Text(
+                              'English Speaking Practice Call',
+                              style: style.titleMedium,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, MeetInitPage.route);
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 16)
+                                  .copyWith(bottom: 0),
+                              decoration: const BoxDecoration().card(scheme),
+                              child: Stack(
+                                children: [
+                                  const Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Icon(
+                                      Icons.keyboard_arrow_right_rounded,
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(12)
+                                            .copyWith(bottom: 4),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: 'On',
+                                            style: TextStyle(
+                                              color: scheme.onSurfaceVariant,
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                  text: ' ${topic.topic}',
+                                                  style: style.titleMedium),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      TimingView(
+                                        timing: data.activeSlots,
+                                        small: true,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox(),
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.all(16).copyWith(bottom: 8),
             child: Text(
@@ -45,10 +120,7 @@ class HomeView extends HookConsumerWidget {
             margin:
                 const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 16),
             height: 72,
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: const BoxDecoration().card(scheme),
             child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: Row(
