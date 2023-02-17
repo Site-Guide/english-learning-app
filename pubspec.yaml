@@ -53,7 +53,7 @@ dependencies:
   share_plus: ^6.3.0
   google_sign_in: ^5.4.3
   jitsi_meet_wrapper: ^0.0.6
-  webview_flutter: ^4.0.2
+  # flutter_inappwebview: ^5.7.2+3
 
   
 dev_dependencies:

@@ -9,12 +9,21 @@ import '../../home/providers/topic_provider.dart';
 
 final meetHandlerProvider = ChangeNotifierProvider((ref) => MeetHandler(ref));
 
-class MeetHandler extends ChangeNotifier{
+enum MeetStatus { init, meet }
+
+class MeetHandler extends ChangeNotifier {
   final Ref _ref;
 
   MeetHandler(this._ref);
 
   bool busy = false;
+
+  MeetStatus _status = MeetStatus.init;
+  MeetStatus get status => _status;
+  set status(MeetStatus value) {
+    _status = value;
+    notifyListeners();
+  }
 
   int? _limit = 2;
   int? get limit => _limit;
@@ -66,24 +75,23 @@ class MeetHandler extends ChangeNotifier{
     }
   }
 
-
-  void start(String id)async{
+  void start(String id) async {
     busy = true;
     final user = await _ref.read(userProvider.future);
     final topic = await _ref.read(topicProvider.future);
-        Map<FeatureFlag, Object> featureFlags = {
+    Map<FeatureFlag, Object> featureFlags = {
       FeatureFlag.isInviteEnabled: false,
-
     };
 
     // Define meetings options here
     var options = JitsiMeetingOptions(
       roomNameOrUrl: id,
-      serverUrl: 'https://jitsi.engexpert.in/',
+      // serverUrl: 'https://jitsi.engexpert.in/',
+      serverUrl: 'https://meet.jit.si/',
       subject: topic!.topic,
       // token: tokenText.text,
       isAudioMuted: false,
-      isAudioOnly: true,
+      isAudioOnly: false,
       isVideoMuted: true,
       userDisplayName: user.name,
       userEmail: user.email,
@@ -92,58 +100,58 @@ class MeetHandler extends ChangeNotifier{
 
     debugPrint("JitsiMeetingOptions: $options");
     await JitsiMeetWrapper.joinMeeting(
-      options: options,
-      listener: JitsiMeetingListener(
-        onOpened: () => debugPrint("onOpened"),
-        onConferenceWillJoin: (url) {
-          debugPrint("onConferenceWillJoin: url: $url");
-        },
-        onConferenceJoined: (url) {
-          debugPrint("onConferenceJoined: url: $url");
-        },
-        onConferenceTerminated: (url, error) {
-          debugPrint("onConferenceTerminated: url: $url, error: $error");
-        },
-        onAudioMutedChanged: (isMuted) {
-          debugPrint("onAudioMutedChanged: isMuted: $isMuted");
-        },
-        onVideoMutedChanged: (isMuted) {
-          debugPrint("onVideoMutedChanged: isMuted: $isMuted");
-        },
-        onScreenShareToggled: (participantId, isSharing) {
-          debugPrint(
-            "onScreenShareToggled: participantId: $participantId, "
-            "isSharing: $isSharing",
-          );
-        },
-        onParticipantJoined: (email, name, role, participantId) {
-          debugPrint(
-            "onParticipantJoined: email: $email, name: $name, role: $role, "
-            "participantId: $participantId",
-          );
-        },
-        onParticipantLeft: (participantId) {
-          debugPrint("onParticipantLeft: participantId: $participantId");
-        },
-        onParticipantsInfoRetrieved: (participantsInfo, requestId) {
-          debugPrint(
-            "onParticipantsInfoRetrieved: participantsInfo: $participantsInfo, "
-            "requestId: $requestId",
-          );
-        },
-        onChatMessageReceived: (senderId, message, isPrivate) {
-          debugPrint(
-            "onChatMessageReceived: senderId: $senderId, message: $message, "
-            "isPrivate: $isPrivate",
-          );
-        },
-        onChatToggled: (isOpen) => debugPrint("onChatToggled: isOpen: $isOpen"),
-        onClosed: () {
-          debugPrint("onClosed");
-          busy = false;
-        },
-        
-      )
-    );
+        options: options,
+        listener: JitsiMeetingListener(
+          onOpened: () => debugPrint("onOpened"),
+          onConferenceWillJoin: (url) {
+            debugPrint("onConferenceWillJoin: url: $url");
+          },
+          onConferenceJoined: (url) {
+            debugPrint("onConferenceJoined: url: $url");
+          },
+          onConferenceTerminated: (url, error) {
+            debugPrint("onConferenceTerminated: url: $url, error: $error");
+          },
+          onAudioMutedChanged: (isMuted) {
+            debugPrint("onAudioMutedChanged: isMuted: $isMuted");
+          },
+          onVideoMutedChanged: (isMuted) {
+            debugPrint("onVideoMutedChanged: isMuted: $isMuted");
+          },
+          onScreenShareToggled: (participantId, isSharing) {
+            debugPrint(
+              "onScreenShareToggled: participantId: $participantId, "
+              "isSharing: $isSharing",
+            );
+          },
+          onParticipantJoined: (email, name, role, participantId) {
+            debugPrint(
+              "onParticipantJoined: email: $email, name: $name, role: $role, "
+              "participantId: $participantId",
+            );
+          },
+          onParticipantLeft: (participantId) {
+            debugPrint("onParticipantLeft: participantId: $participantId");
+          },
+          onParticipantsInfoRetrieved: (participantsInfo, requestId) {
+            debugPrint(
+              "onParticipantsInfoRetrieved: participantsInfo: $participantsInfo, "
+              "requestId: $requestId",
+            );
+          },
+          onChatMessageReceived: (senderId, message, isPrivate) {
+            debugPrint(
+              "onChatMessageReceived: senderId: $senderId, message: $message, "
+              "isPrivate: $isPrivate",
+            );
+          },
+          onChatToggled: (isOpen) =>
+              debugPrint("onChatToggled: isOpen: $isOpen"),
+          onClosed: () {
+            debugPrint("onClosed");
+            busy = false;
+            status = MeetStatus.init;
+          },
+        ));
   }
 }

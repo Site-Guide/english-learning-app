@@ -18,6 +18,8 @@ class MasterData {
     };
   }
 
+  bool get now => activeSlots.where((element) => element.now).isNotEmpty;
+
   List<Timing> get activeSlots {
     slots.sort((a, b) => a.start.hour.compareTo(b.start.hour));
 
