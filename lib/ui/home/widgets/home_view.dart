@@ -41,6 +41,9 @@ class HomeView extends HookConsumerWidget {
           AsyncWidget(
             value: ref.watch(masterDataProvider),
             data: (data) {
+              print(data.slots.map((e) => e.start.label));
+              print(data.slots.map((e) => e.end.label));
+              print(data.activeSlots.length);
               return AsyncWidget(
                 value: ref.watch(topicProvider),
                 data: (topic) => topic != null && data.activeSlots.isNotEmpty

@@ -54,7 +54,7 @@ class TimingView extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    '${e.now ? "Now" : e.start.label} to ${e.end.label}',
+                    '${e.start.label} to ${e.end.label}',
                     style:
                         (small ? style.bodySmall : style.bodyMedium)!.copyWith(
                       color: e.now ? scheme.onPrimary : null,

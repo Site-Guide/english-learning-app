@@ -1,4 +1,5 @@
 import 'package:appwrite/models.dart';
+import 'package:english/cores/enums/level.dart';
 
 class Profile {
   final String id;
@@ -9,6 +10,8 @@ class Profile {
   final String whatsapp;
   final String profession;
   final String purpose;
+  final Level? level;
+  final int quizTimeSpend;
 
   Profile({
     required this.id,
@@ -19,6 +22,8 @@ class Profile {
     required this.profession,
     required this.purpose,
     this.image,
+    this.level,
+    this.quizTimeSpend = 0,
   });
 
   factory Profile.empty() {
@@ -30,6 +35,7 @@ class Profile {
       whatsapp: '',
       profession: '',
       purpose: '',
+      quizTimeSpend: 0,
     );
   }
 
@@ -42,6 +48,7 @@ class Profile {
     String? whatsapp,
     String? profession,
     String? purpose,
+    Level? level,
   }) {
     return Profile(
       id: id ?? this.id,
@@ -52,6 +59,7 @@ class Profile {
       whatsapp: whatsapp ?? this.whatsapp,
       profession: profession ?? this.profession,
       purpose: purpose ?? this.purpose,
+      level: level ?? this.level,
     );
   }
 
@@ -64,6 +72,8 @@ class Profile {
       'whatsapp': whatsapp,
       'profession': profession,
       'purpose': purpose,
+      "level": level?.name,
+      'quizTimeSpend': quizTimeSpend,
     };
   }
 
@@ -78,6 +88,11 @@ class Profile {
       whatsapp: map['whatsapp'] ?? '',
       profession: map['profession'] ?? '',
       purpose: map['purpose'] ?? '',
+      level: Level.values.cast<Level?>().firstWhere(
+        (e) => e?.name == map['level'],
+        orElse: () => null,
+      ),
+      quizTimeSpend: map['quizTimeSpend'] ?? 0,
     );
   }
 }

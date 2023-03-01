@@ -1,7 +1,9 @@
+import 'package:english/cores/models/meet_session.dart';
 import 'package:english/ui/components/app_button.dart';
 import 'package:english/ui/components/async_widget.dart';
 import 'package:english/ui/home/widgets/timing_view.dart';
 import 'package:english/ui/meet/providers/meets_provider.dart';
+import 'package:english/ui/meet/widgets/topic_card.dart';
 import 'package:english/utils/formats.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -25,6 +27,21 @@ class MeetInitPage extends ConsumerWidget {
     final user = ref.read(userProvider).value!;
     final masterData = ref.watch(masterDataProvider).value!;
     final topic = ref.watch(topicProvider).value!;
+
+    void join(MeetSession session) async {
+      await Future.delayed(Duration(microseconds: 200));
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MeetWebPage(
+            topic: topic,
+            id: session.id,
+            duration: Duration(minutes: 2),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Join Practice Call'),
@@ -42,13 +59,18 @@ class MeetInitPage extends ConsumerWidget {
                       return AppButton(
                         label: "Join",
                         onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MeetWebPage(
+                                topic: topic,
+                                id: '111111',
+                                duration: Duration(minutes: 2),
+                              ),
+                            ),
+                          );
                           // handler.status = MeetStatus.meet;
-                          handler.start('shiv');
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) => MeetWebPage(),
-                          //     ));
+                          // handler.start('shiv');
                         },
                       );
                     }),
@@ -78,28 +100,7 @@ class MeetInitPage extends ConsumerWidget {
                             children: [
                               const Text('Topic'),
                               const SizedBox(height: 8),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: scheme.surfaceVariant,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      topic.topic,
-                                      style: style.titleLarge!.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      topic.description,
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              TopicCard(topic: topic),
                             ],
                           ),
                         ),
@@ -153,24 +154,31 @@ class MeetInitPage extends ConsumerWidget {
                         .toList();
                     final ready = data
                         .where((element) =>
-                            element.limit == 2 &&
-                            element.participants.length == 2)
+                            element.limit == handler.limit &&
+                            (element.participants.length ==
+                                (handler.limit ?? 1)))
                         .where((element) =>
                             element.participants.contains(user.$id))
                         .toList();
-
+                    print(ready.length);
+                    print(ready.isNotEmpty);
                     if (ready.isNotEmpty) {
-                      handler.start(ready.first.id);
+                      print('joining');
+                      if (!handler.busy) {
+                        join(ready.first);
+                      }
                     } else {
                       final filtered = data.where((element) =>
-                          element.limit == 2 &&
-                          element.participants.length < 2);
+                          element.limit == handler.limit &&
+                          element.participants.length < (handler.limit ?? 1));
                       if (filtered.isEmpty) {
                         if (!handler.busy) {
+                          print('creating');
                           handler.createMeet();
                         }
                       } else {
                         if (!filtered.first.participants.contains(user.$id)) {
+                          print('joining meet');
                           handler.joinMeet(filtered.first);
                         }
                       }

@@ -11,4 +11,5 @@ class DBs {
 class Collections {
   static const profiles = "profiles";
   static const meetSessions = "meet_sessions";
+  static const quizQuestions = "quiz_questions";
 }

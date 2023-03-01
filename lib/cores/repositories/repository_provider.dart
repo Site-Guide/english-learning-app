@@ -1,6 +1,8 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:english/cores/enums/level.dart';
+import 'package:english/cores/models/quiz_question.dart';
+import 'package:english/ui/profile/providers/my_profile_provider.dart';
 import 'package:english/utils/extensions.dart';
-import 'package:english/utils/formats.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'dart:io' as io;
 import '../models/master_data.dart';
@@ -95,7 +97,6 @@ class Repository {
     );
   }
 
-
   Future<MasterData> getMasterData() => _db
       .getDocument(
         databaseId: DBs.main,
@@ -106,9 +107,7 @@ class Repository {
         (value) => MasterData.fromMap(value),
       );
 
-
-  Future<Topic?> getTopic() => _db
-      .listDocuments(
+  Future<Topic?> getTopic() => _db.listDocuments(
         databaseId: DBs.main,
         collectionId: "topics",
         queries: [
@@ -119,4 +118,67 @@ class Repository {
             ? null
             : Topic.fromMap(value.documents.first),
       );
+
+  // Future<void> writeQuiz() async {
+  //   try {
+  //     await _db.createDocument(
+  //       databaseId: DBs.main,
+  //       collectionId: "quiz_questions",
+  //       documentId: ID.unique(),
+  //       data: QuizQuestion(
+  //         id: '',
+  //         question: 'I read books ..... night.',
+  //         options: {
+  //           "0": "In the night",
+  //           "1": "At night",
+  //         },
+  //         answer: "1",
+  //       ).toMap(),
+  //     );
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  Future<List<QuizQuestion>> listQuizQuestions() async {
+    return _db
+        .listDocuments(
+          databaseId: DBs.main,
+          collectionId: "quiz_questions",
+        )
+        .then(
+          (value) {
+            final values = value.documents
+              .map(
+                (e) => QuizQuestion.fromMap(e),
+              )
+              .toList();
+          values.sort((a, b) => a.index.compareTo(b.index),);
+          return values;
+          }
+        );
+  }
+
+  Future<void> updateTimeSpend(Duration duration) async {
+    final profile = await _ref.read(myProfileProvider.future);
+    await _db.updateDocument(
+        databaseId: DBs.main,
+        collectionId: "profiles",
+        documentId: profile.id,
+        data: {
+          'quizTimeSpend': duration.inSeconds,
+        });
+  }
+
+  Future<void> updateLevel(Level level, {required Duration timeSpend}) async {
+    final profile = await _ref.read(myProfileProvider.future);
+    await _db.updateDocument(
+        databaseId: DBs.main,
+        collectionId: "profiles",
+        documentId: profile.id,
+        data: {
+          'level': level.name,
+          'quizTimeSpend': timeSpend.inSeconds,
+        });
+  }
 }

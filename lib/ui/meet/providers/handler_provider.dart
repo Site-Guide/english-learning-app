@@ -32,6 +32,11 @@ class MeetHandler extends ChangeNotifier {
     notifyListeners();
   }
 
+  void init(){
+    busy = false;
+    status = MeetStatus.init;
+  }
+
   Future<void> createMeet() async {
     busy = true;
     final user = await _ref.read(userProvider.future);
@@ -40,8 +45,8 @@ class MeetHandler extends ChangeNotifier {
       await _ref.read(meetRepositoryProvider).writeMeetSession(
             MeetSession(
               id: '',
-              subject: 'English',
-              limit: 2,
+              subject: _ref.read(topicProvider).value!.topic,
+              limit: limit,
               participants: [user.$id],
               createdAt: DateTime.now(),
             ),
@@ -81,18 +86,21 @@ class MeetHandler extends ChangeNotifier {
     final topic = await _ref.read(topicProvider.future);
     Map<FeatureFlag, Object> featureFlags = {
       FeatureFlag.isInviteEnabled: false,
+      FeatureFlag.isVideoMuteButtonEnabled: false,
     };
 
     // Define meetings options here
     var options = JitsiMeetingOptions(
       roomNameOrUrl: id,
+
       // serverUrl: 'https://jitsi.engexpert.in/',
       serverUrl: 'https://meet.jit.si/',
       subject: topic!.topic,
+      
       // token: tokenText.text,
       isAudioMuted: false,
-      isAudioOnly: false,
-      isVideoMuted: true,
+      isAudioOnly: true,
+      // isVideoMuted: true,
       userDisplayName: user.name,
       userEmail: user.email,
       featureFlags: featureFlags,
