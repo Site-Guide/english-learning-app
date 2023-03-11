@@ -26,6 +26,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final base = ThemeData.light(useMaterial3: true).textTheme;
+    final colorScheme = ColorScheme.fromSeed(seedColor: Color(0xFF0077B6)).copyWith(
+      primary: Color(0xFF0077B6),
+    );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: Labels.appName,
@@ -83,7 +86,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         primarySwatch: Colors.orange,
-        colorScheme: lightColorScheme,
+        colorScheme: colorScheme,
         useMaterial3: true,
         dividerTheme: DividerThemeData(color: lightColorScheme.surfaceVariant),
         inputDecorationTheme: InputDecorationTheme(

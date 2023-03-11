@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../cores/providers/cache_provider.dart';
 import '../../cores/providers/master_data_provider.dart';
 import '../auth/providers/user_provider.dart';
+import '../purchases/providers/purchases_provider.dart';
 import '../root.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -29,6 +30,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       await ref.read(cacheProvider.future);
       await ref.read(masterDataProvider.future);
       await ref.read(userProvider.future);
+      await ref.read(purchasesProvider.future);
       await Future.delayed(const Duration(seconds: 1));
     } catch (e) {
       debugPrint("$e");

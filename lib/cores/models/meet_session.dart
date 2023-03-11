@@ -1,4 +1,5 @@
 import 'package:appwrite/models.dart';
+import 'package:english/utils/extensions.dart';
 
 enum MeetSessionStatus {
   waiting,
@@ -15,6 +16,23 @@ class MeetSession {
   final List<String> participants;
   // final MeetSessionStatus status;
 
+  bool get isFull => limit != null && participants.length >= limit!;
+
+  bool isJoinReady(int? limit) => !isFull && !expired && this.limit == limit;
+
+  bool get expired =>
+      createdAt.isBefore(DateTime.now().subtract(const Duration(minutes: 1)));
+
+  bool isReadyForMeet(String id) =>
+      !expired &&
+      (participants.length >= (limit ?? 1)) &&
+      participants.contains(id);
+  
+  bool needToWait(String id) =>
+      !expired &&
+      (participants.length < (limit ?? 1)) &&
+      participants.contains(id);
+
   MeetSession({
     required this.id,
     required this.subject,
@@ -29,6 +47,7 @@ class MeetSession {
       'limit': limit,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'participants': participants,
+      'date': createdAt.date,
     };
   }
 

@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../utils/labels.dart';
 import '../auth/providers/auth_provider.dart';
 import '../auth/providers/user_provider.dart';
+import '../plans/plans_page.dart';
 import 'providers/my_profile_provider.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -14,7 +15,7 @@ class ProfilePage extends ConsumerWidget {
     final scheme = theme.colorScheme;
     final style = theme.textTheme;
     final user = ref.read(userProvider).value!;
-    final profile = ref.read(myProfileProvider).value!;
+    final profile = ref.read(profileProvider).value!;
     return Scaffold(
       backgroundColor: scheme.surface,
       appBar: AppBar(
@@ -45,7 +46,13 @@ class ProfilePage extends ConsumerWidget {
           //   ),
           // ),
           // const SizedBox(height: 16),
-
+          ListTile(
+            title: Text("Plans"),
+            trailing: Icon(Icons.keyboard_arrow_right_rounded),
+            onTap: () {
+              Navigator.pushNamed(context, PlansPage.route);
+            },
+          ),
           // ListTile(
           //   title: const Text("Help & Support"),
           //   trailing: Icon(Icons.keyboard_arrow_right_rounded),

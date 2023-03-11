@@ -8,14 +8,20 @@ import 'package:flutter/material.dart';
 class MasterData {
   final List<Timing> slots;
   final int version;
+  final int versionIOS;
   final bool force;
+  final bool forceIOS;
   final Map<Level, int> levelToMinMark;
+  final Map<Level, int> dailyCalls;
 
   MasterData({
     required this.slots,
     required this.force,
     required this.version,
     required this.levelToMinMark,
+    required this.dailyCalls,
+    required this.versionIOS,
+    required this.forceIOS,
   });
 
   // Map<String, dynamic> toMap() {
@@ -52,8 +58,18 @@ class MasterData {
       ),
       force: map['force'] ?? false,
       version: map['version'] ?? 0,
+      forceIOS: map['forceIOS'] ?? false,
+      versionIOS: map['versionIOS'] ?? 0,
       levelToMinMark: Map<Level, int>.from(
         (json.decode(map['levelToMinMark']))?.map(
+              (key, value) => MapEntry(
+                  Level.values.firstWhere((element) => element.name == key),
+                  value),
+            ) ??
+            {},
+      ),
+      dailyCalls: Map<Level, int>.from(
+        (json.decode(map['dailyCalls']))?.map(
               (key, value) => MapEntry(
                   Level.values.firstWhere((element) => element.name == key),
                   value),
@@ -71,6 +87,8 @@ class Timing {
     required this.start,
     required this.end,
   });
+
+  String get label => '${start.label} to ${end.label}';
 
   bool get now =>
       DateTime.now()

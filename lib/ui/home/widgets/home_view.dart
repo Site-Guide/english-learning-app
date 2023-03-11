@@ -41,12 +41,9 @@ class HomeView extends HookConsumerWidget {
           AsyncWidget(
             value: ref.watch(masterDataProvider),
             data: (data) {
-              print(data.slots.map((e) => e.start.label));
-              print(data.slots.map((e) => e.end.label));
-              print(data.activeSlots.length);
               return AsyncWidget(
-                value: ref.watch(topicProvider),
-                data: (topic) => topic != null && data.activeSlots.isNotEmpty
+                value: ref.watch(topicsProvider),
+                data: (topic) => topic.isNotEmpty && data.activeSlots.isNotEmpty
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -90,7 +87,7 @@ class HomeView extends HookConsumerWidget {
                                             ),
                                             children: [
                                               TextSpan(
-                                                  text: ' ${topic.topic}',
+                                                  text: ' ${topic.first.name}',
                                                   style: style.titleMedium),
                                             ],
                                           ),

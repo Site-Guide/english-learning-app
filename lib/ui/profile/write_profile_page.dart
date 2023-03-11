@@ -30,7 +30,7 @@ class WriteProfilePage extends HookConsumerWidget {
       try {
         if (formKey.value.currentState!.validate()) {
           await model.write(skip: skip);
-          ref.refresh(myProfileProvider);
+          ref.refresh(profileProvider);
         }
       } catch (e) {
         AppSnackbar(context).error(e);

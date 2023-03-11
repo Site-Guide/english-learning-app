@@ -34,11 +34,11 @@ class QuizViewModel extends ChangeNotifier {
   bool initialized = false;
 
   void init(VoidCallback onTimeOut) async {
-    if(initialized) return;
+    if (initialized) return;
     initialized = true;
     questions = await _repository.listQuizQuestions();
     _totalDuration = Duration(seconds: questions.length * 90);
-    final profile = await _ref.read(myProfileProvider.future);
+    final profile = await _ref.read(profileProvider.future);
     final spend = Duration(seconds: profile.quizTimeSpend);
     _remainingDuration = _totalDuration - spend;
     startedAt = DateTime.now();

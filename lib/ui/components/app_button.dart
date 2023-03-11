@@ -12,17 +12,18 @@ class AppButton extends StatelessWidget {
     final style = theme.textTheme;
     return MaterialButton(
       disabledColor: scheme.onSurface.withOpacity(0.12),
-      color: scheme.primaryContainer,
-      textColor: scheme.onPrimaryContainer,
+      color: scheme.primary,
+      textColor: onPressed != null? scheme.onPrimary: null,
       padding: const EdgeInsets.all(16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
       onPressed:onPressed,
+      disabledTextColor:  scheme.outline,
       child: Text(
         label,
         style: style.titleMedium!.copyWith(
-          color: scheme.onPrimaryContainer,
+          color: onPressed!=null? scheme.onPrimary: scheme.outline,
         ),
       ),
     );

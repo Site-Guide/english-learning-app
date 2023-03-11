@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:english/cores/models/meet_session.dart';
 import 'package:english/cores/repositories/doc_repository_provider.dart';
 import 'package:english/cores/utils/ids.dart';
+import 'package:english/utils/extensions.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../providers/db_provider.dart';
@@ -13,7 +14,7 @@ class MeetRepsitory {
 
   MeetRepsitory(this._ref);
 
-  Databases get db => _ref.read(dbProvider);
+  Databases get _db => _ref.read(dbProvider);
 
   Stream<List<MeetSession>> streamMeetSessions() {
     return _ref.read(docRepositoryProvider).streamDocuments(
@@ -38,19 +39,28 @@ class MeetRepsitory {
 
   Future<void> writeMeetSession(MeetSession meetSession) async {
     if (meetSession.id.isEmpty) {
-      await db.createDocument(
+      await _db.createDocument(
         databaseId: DBs.main,
         collectionId: Collections.meetSessions,
         documentId: ID.unique(),
         data: meetSession.toMap(),
       );
     } else {
-      await db.updateDocument(
+      await _db.updateDocument(
         databaseId: DBs.main,
         collectionId: Collections.meetSessions,
         documentId: meetSession.id,
         data: meetSession.toMap(),
       );
     }
+  }
+
+  Future<List<MeetSession>> listMyTodaysCompletedMeets(String uid){
+    return _db.listDocuments(databaseId: DBs.main, collectionId: Collections.meetSessions, queries: [
+      Query.search('participants', uid),
+      Query.equal('success', 'true'),
+      Query.equal('date', DateTime.now().date),
+      
+    ]).then((value) => value.documents.map((e) => MeetSession.fromMap(e)).toList());
   }
 }

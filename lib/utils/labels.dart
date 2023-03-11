@@ -5,7 +5,6 @@ class Labels {
   // static const String appShareText =
   //     "Unite, Connect and Celebrate with Lexci - the community app that brings people together. Join and organize events, connect with like-minded individuals and build new relationships. Download now and experience the power of community.";
 
-
   // static const String signupOrLogin = 'Signup or Login';
   // static const String enterYourMobileNumber = "Enter your mobile number";
   // static const String verifyOTP = 'Verify OTP';
@@ -15,32 +14,38 @@ class Labels {
 
   static const String alreadyHaveAnAccount = "Already have an account? ";
   static const String appName = "Engexpert";
+  static const String areYouSureYouWantToSubmitQuiz = "Are you sure you want to submit the quiz?";
   static const String confirmPassword = "Confirm Password";
-    static const String description = "";
+  static const String congratulation = "Congratulation!";
+  static const String description = "";
 
   static const String done = "DONE";
   static const String dontHaveAnAccount = "Don't have an account? ";
   static const String email = "Email";
   // static const String emailNotVerifiedYet = "Email not verified yet!";
   static const String enterValidEmail = "Enter valid email";
-    static const String enterYourRegisteredEmail =
+  static const String enterYourRegisteredEmail =
       "Enter your registered email below to receive password reset link";
   static const String forgotPassword = "Forgot Password?";
-    static const String forgotYourPassword = "Forgot your password?";
+  static const String forgotYourPassword = "Forgot your password?";
 
   static const String heyThere =
       "Hey there! You need to update the app to access latest features 🆕📲";
   static const String later = "Later";
-    static const String login = "Login";
+  static const String login = "Login";
 
   static const String missmatchPassword = "Mismatch Password!";
   static const String myProfile = "My Profile";
 
   static const String name = "Name";
   static const String next = "Next";
+  static const String no = "No";
+  static const String ok = "OK";
   static const String or = "OR";
+  
   static const String password = "Password";
   static const String pickImage = "Pick Image";
+  static const String quiz = "Quiz";
   static const String rememberPassword = "Remember password?";
 
   static const String resend = "RESEND";
@@ -52,6 +57,7 @@ class Labels {
   static const String signInWithGoogle = "Sign in with Google";
   static const String signUp = "Sign Up";
   static const String skip = "Skip";
+  static const String submit = "Submit";
   static const String update = "Update";
   static const String urghhYou =
       "Urghh! You are using an older version of the app which no longer is supported ⚠️";
@@ -60,10 +66,12 @@ class Labels {
   static const String verifyYouEmail = "Verify you email";
   static verificationEmailLink(String email) =>
       "Verification email link sent to $email";
+  
+  static const String yes = "Yes";
+  static  String youHaveReached(String value) => "You've reached level $value";
   static const String rs = "₹";
 
   // static const String save = "Save";
   // static const String saveAndNext = "Save & Next";
   // static const String search = "Search";
-
 }

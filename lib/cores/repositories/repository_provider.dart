@@ -97,26 +97,18 @@ class Repository {
     );
   }
 
-  Future<MasterData> getMasterData() => _db
-      .getDocument(
-        databaseId: DBs.main,
-        collectionId: "masterData",
-        documentId: "v1",
-      )
-      .then(
-        (value) => MasterData.fromMap(value),
-      );
-
-  Future<Topic?> getTopic() => _db.listDocuments(
+  Future<List<Topic>> listTopics() => _db.listDocuments(
         databaseId: DBs.main,
         collectionId: "topics",
         queries: [
           Query.equal('date', DateTime.now().date),
         ],
       ).then(
-        (value) => value.documents.isEmpty
-            ? null
-            : Topic.fromMap(value.documents.first),
+        (value) => value.documents
+            .map(
+              (e) => Topic.fromMap(e),
+            )
+            .toList(),
       );
 
   // Future<void> writeQuiz() async {
@@ -143,24 +135,24 @@ class Repository {
   Future<List<QuizQuestion>> listQuizQuestions() async {
     return _db
         .listDocuments(
-          databaseId: DBs.main,
-          collectionId: "quiz_questions",
-        )
-        .then(
-          (value) {
-            final values = value.documents
-              .map(
-                (e) => QuizQuestion.fromMap(e),
-              )
-              .toList();
-          values.sort((a, b) => a.index.compareTo(b.index),);
-          return values;
-          }
-        );
+      databaseId: DBs.main,
+      collectionId: "quiz_questions",
+    )
+        .then((value) {
+      final values = value.documents
+          .map(
+            (e) => QuizQuestion.fromMap(e),
+          )
+          .toList();
+      values.sort(
+        (a, b) => a.index.compareTo(b.index),
+      );
+      return values;
+    });
   }
 
   Future<void> updateTimeSpend(Duration duration) async {
-    final profile = await _ref.read(myProfileProvider.future);
+    final profile = await _ref.read(profileProvider.future);
     await _db.updateDocument(
         databaseId: DBs.main,
         collectionId: "profiles",
@@ -171,7 +163,7 @@ class Repository {
   }
 
   Future<void> updateLevel(Level level, {required Duration timeSpend}) async {
-    final profile = await _ref.read(myProfileProvider.future);
+    final profile = await _ref.read(profileProvider.future);
     await _db.updateDocument(
         databaseId: DBs.main,
         collectionId: "profiles",

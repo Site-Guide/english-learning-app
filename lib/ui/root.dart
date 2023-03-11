@@ -19,9 +19,9 @@ class Root extends ConsumerWidget {
     final cache = ref.read(cacheProvider).value!;
     return ref.watch(userProvider).when(
           data: (user) => user.emailVerification
-              ? ref.watch(myProfileProvider).when(
+              ? ref.watch(profileProvider).when(
                     data: (profile) =>
-                        profile.level != null ? QuizPage() : const HomePage(),
+                        profile.level == null ? QuizPage() : const HomePage(),
                     error: (e, s) => e == Constants.documentNotExists
                         ? const WriteProfilePage()
                         : Scaffold(

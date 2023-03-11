@@ -11,6 +11,13 @@ extension Crim on String? {
   }
 }
 
+
+extension IntNull on int {
+  int? get crim => this == 0 ? null : this;
+  String get asRupee => '₹$this';
+}
+
+
 extension Typee on String {
   String get types => split('-').first;
   String get type => split('-').last;

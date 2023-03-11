@@ -2,12 +2,13 @@
 
 import 'package:english/ui/auth/providers/user_provider.dart';
 import 'package:english/ui/components/app_button.dart';
-import 'package:english/ui/components/async_widget.dart';
 import 'package:english/ui/components/loading_layer.dart';
 import 'package:english/ui/quiz/providers/quiz_view_model_provider.dart';
 import 'package:english/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../utils/labels.dart';
 
 class QuizPage extends ConsumerWidget {
   const QuizPage({super.key});
@@ -27,17 +28,17 @@ class QuizPage extends ConsumerWidget {
           builder: (context) => AlertDialog(
             backgroundColor: scheme.surface,
             surfaceTintColor: scheme.surface,
-            title: const Text('Congratulation!'),
+            title: const Text(Labels.congratulation),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  "You've reached level ${level.name.toUpperCase()}",
+                  Labels.youHaveReached(level.name.toUpperCase())
                 ),
                 const SizedBox(height: 16),
                 AppButton(
-                  label: "OK",
+                  label: Labels.ok,
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -60,24 +61,24 @@ class QuizPage extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.all(16.0).copyWith(top: 0),
             child: AppButton(
-              label: "Submit",
+              label: Labels.submit,
               onPressed: () async {
                 final value = await showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
                     backgroundColor: scheme.surface,
                     surfaceTintColor: scheme.surface,
-                    title: const Text('Are you sure you want to submit the quiz?'),
+                    title: const Text(Labels.areYouSureYouWantToSubmitQuiz),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
-                        child: const Text('No'),
+                        child: const Text(Labels.no),
                       ),
                       MaterialButton(
                         color: scheme.primary,
                         textColor: scheme.onPrimary,
                         onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Yes'),
+                        child: const Text(Labels.yes),
                       ),
                     ],
                   ),
@@ -90,7 +91,7 @@ class QuizPage extends ConsumerWidget {
           ),
         ),
         appBar: AppBar(
-          title: const Text('Quiz'),
+          title:  const Text(Labels.quiz),
           actions: [
             if (model.startedAt != null)
               StreamBuilder(

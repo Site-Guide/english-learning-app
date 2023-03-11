@@ -16,8 +16,8 @@ class TimingView extends StatelessWidget {
       padding: small
           ? const EdgeInsets.all(12).copyWith(top: 4)
           : const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
+              horizontal: 4,
+              vertical: 0,
             ),
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -49,12 +49,12 @@ class TimingView extends StatelessWidget {
                     color: e.now ? scheme.primary : null,
                     shape: StadiumBorder(
                       side: BorderSide(
-                        color: scheme.onSurface,
+                        color: e.now ? scheme.primary : scheme.outline,
                       ),
                     ),
                   ),
                   child: Text(
-                    '${e.start.label} to ${e.end.label}',
+                    e.label,
                     style:
                         (small ? style.bodySmall : style.bodyMedium)!.copyWith(
                       color: e.now ? scheme.onPrimary : null,
