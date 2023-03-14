@@ -53,12 +53,12 @@ class MeetInitPage extends HookConsumerWidget {
           child: CircularProgressIndicator(),
         );
       }
-      // if ([PermissionStatus.permanentlyDenied, PermissionStatus.denied]
-      //         .contains(model.audio) ||
-      //     [PermissionStatus.permanentlyDenied, PermissionStatus.denied]
-      //         .contains(model.camera)) {
-      //   return const PermissionsPage();
-      // }
+      if ([PermissionStatus.permanentlyDenied, PermissionStatus.denied]
+              .contains(model.audio) ||
+          [PermissionStatus.permanentlyDenied, PermissionStatus.denied]
+              .contains(model.camera)) {
+        return const PermissionsPage();
+      }
       return model.subscription != null
           ? const Center(
               child: CircularProgressIndicator(),
