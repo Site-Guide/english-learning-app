@@ -32,10 +32,12 @@ class TopicCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                selected
+                if(onTap!= null)...[
+                  selected
                     ?  Icon(Icons.radio_button_checked_rounded,color: scheme.primary,)
                     :  Icon(Icons.radio_button_off_rounded,color: scheme.outline,),
                 const SizedBox(width: 8),
+                ],
                 Text(
                   topic.name,
                   style: style.titleLarge!.copyWith(

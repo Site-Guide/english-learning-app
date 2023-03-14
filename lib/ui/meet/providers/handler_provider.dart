@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:appwrite/models.dart';
 import 'package:english/cores/enums/purchase_type.dart';
 import 'package:english/cores/models/master_data.dart';
 import 'package:english/cores/models/profile.dart';
@@ -10,6 +9,7 @@ import 'package:english/ui/profile/providers/my_profile_provider.dart';
 import 'package:english/ui/purchases/providers/purchases_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../cores/models/meet_session.dart';
 import '../../../cores/providers/master_data_provider.dart';
@@ -17,7 +17,8 @@ import '../../../cores/repositories/meet_repository_provider.dart';
 import '../../auth/providers/user_provider.dart';
 import '../../home/providers/topic_provider.dart';
 
-final meetHandlerProvider = ChangeNotifierProvider.autoDispose((ref) => MeetHandler(ref));
+final meetHandlerProvider =
+    ChangeNotifierProvider.autoDispose((ref) => MeetHandler(ref)..init());
 
 enum MeetStatus { init, meet }
 
@@ -35,7 +36,7 @@ class MeetHandler extends ChangeNotifier {
 
   List<Topic> get elegibleTopics => _topics
       .where((topic) =>
-          topic.courseId == null ||
+          topic.courseId == null  ||
           elegiblePurchases
               .where(
                 (purchase) => purchase.typeId == topic.courseId,
@@ -53,7 +54,7 @@ class MeetHandler extends ChangeNotifier {
   Purchase? get appliedPurchase => elegiblePurchases
       .where((element) => _selectedTopic!.courseId != null
           ? element.typeId == _selectedTopic!.courseId
-          : element.type == PurchaseType.plan)
+          : true)
       .first;
 
   MasterData get _masterData => _ref.read(masterDataProvider).value!;
@@ -65,7 +66,45 @@ class MeetHandler extends ChangeNotifier {
   void init() async {
     await _ref.read(purchasesProvider.future);
     await _ref.read(topicsProvider.future);
+    checkPermissions();
   }
+
+  Future<void> checkPermissions() async {
+    audio = await Permission.microphone.status;
+    camera = await Permission.camera.status;
+    notifyListeners();
+  }
+
+  Future<void> requestAudio() async {
+    final status = await Permission.microphone.request();
+    audio = status;
+    notifyListeners();
+  }
+
+  Future<void> requestCamera() async {
+    final status = await Permission.camera.request();
+    camera = status;
+    notifyListeners();
+  }
+
+  void request() async {
+    List<Permission> list = [Permission.camera, Permission.microphone];
+    final map = await list.request();
+    map.forEach((key, value) {
+      if (key == Permission.camera) {
+        print("camera: $value");
+        camera = value;
+      } else if (key == Permission.microphone) {
+        print("audio: $value");
+        audio = value;
+        print(audio);
+      }
+    });
+    notifyListeners();
+  }
+
+  PermissionStatus? audio;
+  PermissionStatus? camera;
 
   int? _limit = 2;
   int? get limit => _limit;
@@ -83,42 +122,44 @@ class MeetHandler extends ChangeNotifier {
   StreamSubscription<List<MeetSession>>? subscription;
   Timer? _timer;
 
-  Timer? _meetTimer;
-
-  void startRandomJoin(
-      {required Function(MeetSession session) onJoin,
-      required VoidCallback onEnd}) {
+  void startRandomJoin({
+    required Function(MeetSession session) onJoin,
+  }) {
     final user = _ref.read(userProvider).value!;
     final stream = _repository.streamMeetSessions();
+    print('Started');
     subscription = stream.listen((event) {
       final readyMeets =
           event.where((element) => element.isReadyForMeet(user.$id));
       if (readyMeets.isNotEmpty) {
+        print('ready for meet');
         final meet = readyMeets.first;
         onJoin(meet);
-        _meetTimer = Timer(const Duration(seconds: 10), () {
-          onEnd();
-          _meetTimer?.cancel();
-        });
         subscription?.cancel();
         subscription = null;
         _timer?.cancel();
         notifyListeners();
         return;
       }
+      print("No ready meets");
       final needToWaitMeets =
           event.where((element) => element.needToWait(user.$id));
       if (needToWaitMeets.isNotEmpty) {
+        print("wait meets");
         return;
       }
+      print("No wait meets");
       if (busy) {
+        print("Busy");
         return;
       }
       final meets = event.where((element) => element.isJoinReady(limit));
       if (meets.isNotEmpty) {
+        print('joning meet');
         final meet = meets.first;
         joinMeet(meet);
       } else {
+        print('creating meet');
         createMeet();
       }
     });
@@ -134,20 +175,22 @@ class MeetHandler extends ChangeNotifier {
   Future<void> createMeet() async {
     busy = true;
     final user = await _ref.read(userProvider.future);
-
     try {
+      await Future.delayed(const Duration(seconds: 1));
       await _repository.writeMeetSession(
         MeetSession(
           id: '',
-          subject: _ref.read(topicsProvider).value!.first.name,
+          topic: selectedTopic!.name,
           limit: limit,
           participants: [user.$id],
           createdAt: DateTime.now(),
+          topicId: selectedTopic!.id,
         ),
       );
       await Future.delayed(const Duration(seconds: 1));
       busy = false;
     } catch (e) {
+      print(e);
       busy = false;
       return Future.error(e);
     }

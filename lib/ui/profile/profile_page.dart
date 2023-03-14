@@ -46,13 +46,13 @@ class ProfilePage extends ConsumerWidget {
           //   ),
           // ),
           // const SizedBox(height: 16),
-          ListTile(
-            title: Text("Plans"),
-            trailing: Icon(Icons.keyboard_arrow_right_rounded),
-            onTap: () {
-              Navigator.pushNamed(context, PlansPage.route);
-            },
-          ),
+          // ListTile(
+          //   title: Text("Plans"),
+          //   trailing: Icon(Icons.keyboard_arrow_right_rounded),
+          //   onTap: () {
+          //     Navigator.pushNamed(context, PlansPage.route);
+          //   },
+          // ),
           // ListTile(
           //   title: const Text("Help & Support"),
           //   trailing: Icon(Icons.keyboard_arrow_right_rounded),

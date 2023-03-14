@@ -9,7 +9,7 @@ class Purchase {
   final DateTime start;
   final DateTime? end;
   final int calls;
-  final int callsDone;
+   int callsDone;
   final int amount;
   final String? paymentId;
   final PaymentStatus paymentStatus;

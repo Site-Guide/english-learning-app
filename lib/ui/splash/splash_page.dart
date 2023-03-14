@@ -53,10 +53,13 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       // backgroundColor: scheme.primary,
       body: SafeArea(
         child: Center(
-          child: SvgPicture.asset(
-            Assets.logo,
-            height: 200,
-            width: 200,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(3000),
+            child: SvgPicture.asset(
+              Assets.logo,
+              height: 200,
+              width: 200,
+            ),
           ),
           // child: Column(
           //   mainAxisAlignment: MainAxisAlignment.center,

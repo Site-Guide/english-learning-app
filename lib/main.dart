@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final base = ThemeData.light(useMaterial3: true).textTheme;
-    final colorScheme = ColorScheme.fromSeed(seedColor: Color(0xFF0077B6)).copyWith(
+    final colorScheme =
+        ColorScheme.fromSeed(seedColor: Color(0xFF0077B6)).copyWith(
       primary: Color(0xFF0077B6),
     );
     return MaterialApp(
@@ -74,12 +75,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: lightColorScheme.surface,
         extensions: [lightCustomColors],
-        appBarTheme:  AppBarTheme(
+        appBarTheme: AppBarTheme(
           centerTitle: true,
-          titleTextStyle: TextStyle(
-            fontSize: 18,
-            color: lightColorScheme.onSurface
-          ),
+          titleTextStyle:
+              TextStyle(fontSize: 18, color: lightColorScheme.onSurface),
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarIconBrightness: Brightness.dark,
             statusBarColor: Colors.transparent,
@@ -94,6 +93,8 @@ class MyApp extends StatelessWidget {
           hintStyle: TextStyle(
             color: lightColorScheme.onSurface.withOpacity(0.5),
           ),
+          filled: true,
+          fillColor: colorScheme.surfaceVariant.withOpacity(0.5)
         ),
         cupertinoOverrideTheme:
             CupertinoThemeData(primaryColor: lightColorScheme.secondary),

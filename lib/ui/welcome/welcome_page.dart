@@ -34,17 +34,22 @@ class WelcomePage extends HookWidget {
       appBar: AppBar(
         centerTitle: false,
         titleSpacing: 0,
-        leadingWidth: 32 + 16 + 8,
-        leading: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            SvgPicture.asset(
-              Assets.logo,
-              height: 32,
-              width: 32,
-            ),
-            const SizedBox(width: 8),
-          ],
+        leadingWidth: 40 + 16 + 8,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(3000),
+                child: SvgPicture.asset(
+                  Assets.logo,
+                  height: 40,
+                  width: 40,
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
         ),
         title: const Text('ENGEXPERT'),
       ),

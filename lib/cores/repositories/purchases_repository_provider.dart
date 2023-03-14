@@ -1,6 +1,13 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:english/cores/enums/payment_status.dart';
+import 'package:english/cores/enums/purchase_type.dart';
+import 'package:english/cores/models/razorpay_purchase.dart';
+import 'package:english/ui/auth/providers/user_provider.dart';
+import 'package:english/ui/purchases/providers/purchases_provider.dart';
+import 'package:english/utils/dates.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../models/course.dart';
 import '../models/purchase.dart';
 import '../providers/db_provider.dart';
 import '../utils/ids.dart';
@@ -38,18 +45,87 @@ class PurchasesRepository {
 
   Future<List<Purchase>> listPurchases(String uid) async {
     final response = await _db.listDocuments(
-      databaseId: DBs.main,
-      collectionId: Collections.purchases,
-      queries: [
-        Query.equal('uid', uid),
-        Query.equal('expired', false),
-      ]
-    );
+        databaseId: DBs.main,
+        collectionId: Collections.purchases,
+        queries: [
+          Query.equal('uid', uid),
+          Query.equal('expired', false),
+        ]);
 
     return response.documents
         .map(
           (e) => Purchase.fromMap(e),
         )
         .toList();
+  }
+
+  Future<void> increamentCallsDone(Purchase purchase) async {
+    purchase.callsDone++;
+    await _db.updateDocument(
+        databaseId: DBs.main,
+        documentId: purchase.id,
+        collectionId: Collections.purchases,
+        data: {
+          'callsDone': purchase.callsDone,
+        });
+    _ref.refresh(purchasesProvider);
+  }
+
+  Future<void> deleteRazorpayPurchase(String id) async {
+    await _db.deleteDocument(
+      databaseId: DBs.main,
+      documentId: id,
+      collectionId: Collections.razorpayPurchases,
+    );
+  }
+
+  Future<void> initPurchases() async {
+    final user = await _ref.read(userProvider.future);
+    final response = await _db.listDocuments(
+        databaseId: DBs.main,
+        collectionId: Collections.razorpayPurchases,
+        queries: [
+          Query.equal('email', user.email),
+        ]);
+
+    final puchases = response.documents
+        .map(
+          (e) => RazorpayPurchase.fromMap(e),
+        )
+        .toList();
+
+    for (final purchase in puchases) {
+      try {
+        final courses = await _db.listDocuments(
+          databaseId: DBs.main,
+          collectionId: Collections.courses,
+          queries: [
+            Query.equal('price', purchase.amount),
+          ],
+        );
+        if (courses.documents.isEmpty) {
+          continue;
+        }
+
+        final course = Course.fromMap(courses.documents.first);
+        final updated = Purchase(
+          id: '',
+          type: PurchaseType.course,
+          typeId: course.id,
+          start: Dates.now,
+          end: Dates.now.add(Duration(days: course.duration)),
+          calls: course.calls,
+          callsDone: 0,
+          amount: course.price,
+          paymentStatus: PaymentStatus.success,
+          uid: user.$id,
+        );
+        await createPurchase(updated);
+        await deleteRazorpayPurchase(purchase.id);
+      } catch (e) {
+        print('sync error: $e');
+      }
+    }
+    _ref.refresh(purchasesProvider);
   }
 }

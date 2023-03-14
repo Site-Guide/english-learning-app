@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:english/cores/models/attempt.dart';
 import 'package:english/cores/models/meet_session.dart';
 import 'package:english/cores/repositories/doc_repository_provider.dart';
 import 'package:english/cores/utils/ids.dart';
@@ -55,12 +56,23 @@ class MeetRepsitory {
     }
   }
 
-  Future<List<MeetSession>> listMyTodaysCompletedMeets(String uid){
-    return _db.listDocuments(databaseId: DBs.main, collectionId: Collections.meetSessions, queries: [
-      Query.search('participants', uid),
-      Query.equal('success', 'true'),
-      Query.equal('date', DateTime.now().date),
-      
-    ]).then((value) => value.documents.map((e) => MeetSession.fromMap(e)).toList());
+  Future<List<Attempt>> listMyAttemtsToday(String uid) {
+    return _db.listDocuments(
+        databaseId: DBs.main,
+        collectionId: Collections.attempts,
+        queries: [
+          Query.equal('userId', uid),
+          Query.equal('date', DateTime.now().date),
+        ]).then(
+        (value) => value.documents.map((e) => Attempt.fromMap(e)).toList());
+  }
+
+  Future<void> createAttempt(Attempt attempt) async {
+    await _db.createDocument(
+      databaseId: DBs.main,
+      collectionId: Collections.attempts,
+      documentId: ID.unique(),
+      data: attempt.toMap(),
+    );
   }
 }

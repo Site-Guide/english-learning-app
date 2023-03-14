@@ -59,10 +59,10 @@ class DocRepository {
     required String databaseId,
     required String collectionId,
     List<String>? queries,
-    Map<String, dynamic>? match,
-    Map<String, dynamic>? contain,
+    // Map<String, dynamic>? match,
+    // Map<String, dynamic>? contain,
   }) {
-    List<Document>? list;
+    List<Document> list = [];
     final controller = StreamController<List<Document>>();
     db
         .listDocuments(
@@ -70,8 +70,9 @@ class DocRepository {
             collectionId: collectionId,
             queries: queries)
         .then((value) {
-      list = value.documents;
-      controller.add(list!);
+      list.addAll(value.documents);
+      print('added list');
+      controller.add(list);
     });
     final channel = 'databases.$databaseId.collections.$collectionId.documents';
     realTime.subscribe([channel]).stream.listen((event) {
@@ -80,42 +81,45 @@ class DocRepository {
                 event.events.where((element) => element.contains(channel));
             if (filtered.isNotEmpty) {
               final e = filtered.first;
+              print(e);
               switch (e.split('.').last) {
                 case "create":
                   Document? doc = Document.fromMap(event.payload);
-                  if (match != null) {
-                    for (var entry in match.entries) {
-                      if (doc!.data[entry.key] != entry.value) {
-                        doc = null;
-                      }
-                    }
-                  }
-                  if (contain != null) {
-                    for (var entry in contain.entries) {
-                      if (!(doc!.data[entry.key].toString().toLowerCase())
-                          .contains(entry.value.toString().toLowerCase())) {
-                        doc = null;
-                      }
-                    }
-                  }
-                  if(doc!=null){
-                    list!.add(doc);
-                  }
+                  // if (match != null) {
+                  //   for (var entry in match.entries) {
+                  //     if (doc!.data[entry.key] != entry.value) {
+                  //       doc = null;
+                  //     }
+                  //   }
+                  // }
+                  // if (contain != null) {
+                  //   for (var entry in contain.entries) {
+                  //     if (!(doc!.data[entry.key].toString().toLowerCase())
+                  //         .contains(entry.value.toString().toLowerCase())) {
+                  //       doc = null;
+                  //     }
+                  //   }
+                  // }
+                  // print('doc: $')
+                  // if(doc!=null){
+                    list.add(doc);
+                    print('added doc');
+                  // }
                   break;
                 case "update":
                   final doc = Document.fromMap(event.payload);
-                  list!.removeWhere((element) => element.$id == doc.$id);
-                  list!.add(doc);
+                  list.removeWhere((element) => element.$id == doc.$id);
+                  list.add(doc);
                   break;
                 case "delete":
-                  list!.removeWhere(
+                  list.removeWhere(
                     (element) =>
                         element.$id == Document.fromMap(event.payload).$id,
                   );
                   break;
                 default:
               }
-              controller.add(list!);
+              controller.add(list);
             }
           }
         });

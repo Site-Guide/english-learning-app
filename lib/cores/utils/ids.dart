@@ -11,7 +11,10 @@ class DBs {
 class Collections {
   static const profiles = "profiles";
   static const meetSessions = "meet_sessions";
+  static const attempts = "attempts";
   static const quizQuestions = "quiz_questions";
   static const plans = "plans";
   static const purchases = "purchases";
+  static const razorpayPurchases = "razorpay_purchases";
+  static const courses = "courses";
 }

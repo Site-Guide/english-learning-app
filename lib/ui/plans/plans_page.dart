@@ -20,7 +20,7 @@ class PlansPage extends ConsumerWidget {
     return LoadingLayer(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Plans for you'),
+          title: const Text('Purchase call credits'),
         ),
         bottomNavigationBar: SafeArea(
           child: Padding(
