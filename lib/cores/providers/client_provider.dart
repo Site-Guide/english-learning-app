@@ -20,7 +20,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final clientProvider = Provider<Client>(
   (ref)  {
     final channel = Client(
-      endPoint: "http://appwrite.engexpert.in/v1",
+      endPoint: "https://appwrite.engexpert.in/v1",
     );
     channel.setProject("63ca393fc7b7f28ab286");
     channel.setSelfSigned();
