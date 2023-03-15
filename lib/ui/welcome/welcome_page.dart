@@ -40,7 +40,7 @@ class WelcomePage extends HookWidget {
           child: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(3000),
+                // borderRadius: BorderRadius.circular(3000),
                 child: SvgPicture.asset(
                   Assets.logo,
                   height: 40,

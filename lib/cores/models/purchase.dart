@@ -16,7 +16,7 @@ class Purchase {
   final String uid;
   final bool expired;
 
-  bool get isExpired => (end?.isBefore(DateTime.now()) ?? false) && (callsDone >= calls);
+  bool get isExpired => (end?.isBefore(DateTime.now()) ?? false) || (callsDone >= calls);
 
   Purchase({
     required this.id,

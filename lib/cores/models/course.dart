@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:appwrite/models.dart';
 
 class Course {

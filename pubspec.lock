@@ -274,18 +274,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_inappwebview
-      sha256: "6d6c741ddba1dba5229d63ba75767064791a7ce845196b45e31105e93d67c949"
+      sha256: f73505c792cf083d5566e1a94002311be497d984b5607f25be36d685cf6361cf
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0-beta.22"
-  flutter_inappwebview_internal_annotations:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview_internal_annotations
-      sha256: "064a8ccbc76217dcd3b0fd6c6ea6f549e69b2849a0233b5bb46af9632c3ce2ff"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
+    version: "5.7.2+3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -440,22 +432,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.18.0"
-  jitsi_meet_wrapper:
-    dependency: "direct main"
-    description:
-      name: jitsi_meet_wrapper
-      sha256: "7459a792215042e05b4e2380fb1f5467df8bccc82a254c674cd325812fbe219f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.6"
-  jitsi_meet_wrapper_platform_interface:
-    dependency: transitive
-    description:
-      name: jitsi_meet_wrapper_platform_interface
-      sha256: "3ad496e47b6f4de81bf52847b965fe967ca94a5a08cb68c3498dfb1e6beb0d86"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.4"
   js:
     dependency: transitive
     description:
@@ -949,38 +925,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  webview_flutter:
-    dependency: "direct main"
-    description:
-      name: webview_flutter
-      sha256: "9ba213434f13e760ea0f175fbc4d6bb6aeafd7dfc6c7d973f15d3e47a5d6686e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.5"
-  webview_flutter_android:
-    dependency: transitive
-    description:
-      name: webview_flutter_android
-      sha256: "48c8cfb023168473c0a3a4c21ffea6c23a32cc7156701c39f618b303c6a3c96e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.1"
-  webview_flutter_platform_interface:
-    dependency: transitive
-    description:
-      name: webview_flutter_platform_interface
-      sha256: df6472164b3f4eaf3280422227f361dc8424b106726b7f21d79a8656ba53f71f
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.2"
-  webview_flutter_wkwebview:
-    dependency: transitive
-    description:
-      name: webview_flutter_wkwebview
-      sha256: "283a38c2a2544768033864c698e0133aa9eee0f2c800f494b538a3d1044f7ecb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.1"
   win32:
     dependency: transitive
     description:

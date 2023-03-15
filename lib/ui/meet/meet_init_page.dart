@@ -1,10 +1,9 @@
 import 'package:english/cores/models/meet_session.dart';
 import 'package:english/ui/components/app_button.dart';
-import 'package:english/ui/components/async_widget.dart';
-import 'package:english/ui/home/widgets/timing_view.dart';
-import 'package:english/ui/meet/providers/my_attempts_today_provider.dart';
+import 'package:english/ui/components/logo_loading.dart';
+import 'package:english/ui/components/snackbar.dart';
+import 'package:english/ui/meet/providers/sessions_stream_provider.dart';
 import 'package:english/ui/meet/widgets/topic_card.dart';
-import 'package:english/ui/purchases/providers/purchases_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../cores/providers/master_data_provider.dart';
 import '../auth/providers/user_provider.dart';
-import '../home/providers/topic_provider.dart';
 import 'meet_web_page.dart';
 import 'providers/handler_provider.dart';
 
@@ -26,6 +24,7 @@ class MeetInitPage extends HookConsumerWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final style = theme.textTheme;
+    ref.read(sessionsStreamProvider);
     final model = ref.watch(meetHandlerProvider);
     final user = ref.read(userProvider).value!;
     final masterData = ref.read(masterDataProvider).value!;
@@ -35,7 +34,7 @@ class MeetInitPage extends HookConsumerWidget {
         const Duration(microseconds: 200),
       );
       // ignore: use_build_context_synchronously
-      await Navigator.push(
+      await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => MeetWebPage(
@@ -47,11 +46,9 @@ class MeetInitPage extends HookConsumerWidget {
       );
     }
 
-    Widget _buildBody() {
+    Widget buildBody() {
       if (model.camera == null || model.audio == null) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
+        return const LogoLoading();
       }
       if ([PermissionStatus.permanentlyDenied, PermissionStatus.denied]
               .contains(model.audio) ||
@@ -60,133 +57,55 @@ class MeetInitPage extends HookConsumerWidget {
         return const PermissionsPage();
       }
       return model.subscription != null
-          ? const Center(
-              child: CircularProgressIndicator(),
+          ? const LogoLoading(
+              message: "Setting up your call...",
             )
-          : StreamBuilder(
-              stream: Stream.periodic(
-                const Duration(minutes: 1),
-              ),
-              builder: (context, snapshot) {
-                return AsyncWidget(
-                  value: ref.watch(purchasesProvider),
-                  data: (_)=> model.elegiblePurchases.isEmpty
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Text(
-                              "You don't have any call credits. Please purchase course or credits to join a call.",
-                              style: style.titleMedium,
-                              textAlign: TextAlign.center,
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(8),
+                    children: [
+                      TopicCard(
+                        topic: model.selectedTopic!,
+                      ),
+                      ...{2: "2 Members", 5: "5 Members", null: "Group"}
+                          .entries
+                          .map(
+                            (e) => RadioListTile<int?>(
+                              value: e.key,
+                              groupValue: model.limit,
+                              onChanged: (v) {
+                                model.limit = v;
+                              },
+                              title: Text(e.value),
                             ),
-                          ),
-                        )
-                      : AsyncWidget(
-                          value: ref.watch(myAttemtsTodayProvider),
-                          data: (data) {
-                            if (data.length >= model.dailyLimit) {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Text(
-                                    "You have reached your daily limit of ${model.dailyLimit} calls. Please try again tomorrow.",
-                                    style: style.titleMedium,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              );
-                            } else if (model.elegibleTopics.isEmpty) {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Text(
-                                    "You don't have any topics to join. Please wait for your teacher to add topics to your course.",
-                                    style: style.titleMedium,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              );
-                            } else if (!masterData.now) {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        "Practice room available from \n${masterData.slots.map((e) => e.label).join(',\n')}",
-                                        style: style.titleMedium,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
-
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  child: ListView(
-                                    padding: const EdgeInsets.all(8),
-                                    children: [
-                                      TimingView(
-                                        timing: masterData.activeSlots,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0).copyWith(bottom: 0),
-                                        child: Text(
-                                          "Select a topic",
-                                          style: style.titleMedium,
-                                        ),
-                                      ),
-                                      ...model.elegibleTopics.map((e) {
-                                        return TopicCard(
-                                          topic: e,
-                                          selected:
-                                              model.selectedTopic?.id == e.id,
-                                          onTap: () {
-                                            model.selectedTopic = e;
-                                          },
-                                        );
-                                      }),
-                                      ...{
-                                        2: "2 Members",
-                                        5: "5 Members",
-                                        null: "Group"
-                                      }.entries.map(
-                                            (e) => RadioListTile<int?>(
-                                              value: e.key,
-                                              groupValue: model.limit,
-                                              onChanged: (v) {
-                                                model.limit = v;
-                                              },
-                                              title: Text(e.value),
-                                            ),
-                                          )
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.all(16).copyWith(top: 0),
-                                  child: AppButton(
-                                    label: "Join",
-                                    onPressed: model.selectedTopic != null
-                                        ? () {
-                                            model.startRandomJoin(onJoin: (v) {
-                                              join(v);
-                                            });
-                                          }
-                                        : null,
-                                  ),
-                                )
-                              ],
+                          )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16).copyWith(top: 0),
+                  child: AppButton(
+                    label: "Join",
+                    onPressed: model.selectedTopic != null
+                        ? () {
+                            model.startRandomJoin(
+                              onJoin: (v) {
+                                join(v);
+                              },
+                              onSearchEnd: () {
+                                AppSnackbar(context).message(
+                                  'Sorry, No members available to call for this topic. Please try again or select different topic.',
+                                );
+                              },
                             );
-                          }),
-                );
-              },
+                          }
+                        : null,
+                  ),
+                )
+              ],
             );
     }
 
@@ -194,7 +113,7 @@ class MeetInitPage extends HookConsumerWidget {
       appBar: AppBar(
         title: const Text('Join Practice Call'),
       ),
-      body: SafeArea(child: _buildBody()),
+      body: SafeArea(child: buildBody()),
     );
   }
 }
@@ -273,31 +192,36 @@ class PermissionTile extends HookConsumerWidget {
       return permission == Permission.camera ? "Camera" : "Microphone";
     }
 
+    Widget? trailing() {
+      if (status == PermissionStatus.granted) {
+        return const Icon(Icons.check_circle_rounded, color: Colors.green);
+      } else {
+        return const Icon(Icons.keyboard_arrow_right_rounded);
+      }
+    }
+
     return ListTile(
-      onTap: () async {
-        if (status == PermissionStatus.denied) {
-          onRequest();
-        } else {
-          await openAppSettings();
-        }
-      },
-      title: Text(name()),
-      subtitle: status == PermissionStatus.denied
-          ? Text('Tap to allow access to ${name().toLowerCase()}')
-          : status == PermissionStatus.permanentlyDenied
-              ? RefreshableText(
-                  name().toLowerCase(),
-                  onRefresh: () {
-                    onRequest();
-                  },
-                )
-              : null,
-      trailing: isAndroid || status == PermissionStatus.denied
-          ? const Icon(Icons.keyboard_arrow_right_rounded)
-          : status == PermissionStatus.granted
-              ? const Icon(Icons.check_circle_rounded, color: Colors.green)
-              : const Icon(CupertinoIcons.settings),
-    );
+        onTap: status != PermissionStatus.granted
+            ? () async {
+                if (status == PermissionStatus.denied) {
+                  onRequest();
+                } else {
+                  await openAppSettings();
+                }
+              }
+            : null,
+        title: Text(name()),
+        subtitle: status == PermissionStatus.denied
+            ? Text('Tap to allow access to ${name().toLowerCase()}')
+            : status == PermissionStatus.permanentlyDenied
+                ? RefreshableText(
+                    name().toLowerCase(),
+                    onRefresh: () {
+                      onRequest();
+                    },
+                  )
+                : null,
+        trailing: trailing());
   }
 }
 

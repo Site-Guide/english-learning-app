@@ -3,6 +3,7 @@
 import 'package:english/ui/home/coming_soon_page.dart';
 import 'package:english/ui/home/widgets/home_view.dart';
 import 'package:english/ui/meet/meet_init_page.dart';
+import 'package:english/ui/meet/select_topic_page.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -138,9 +139,9 @@ class _HomePageState extends ConsumerState<HomePage>
             .toList(),
       ),
       body: [
-        HomeView(),
-        ComingSoonPage(),
-        MeetInitPage(),
+        SelectTopicPage(),
+        ComingSoonPage(label: 'Courses',),
+        ComingSoonPage(label: "Discussions",),
         const ProfilePage(),
       ][index.value],
     );

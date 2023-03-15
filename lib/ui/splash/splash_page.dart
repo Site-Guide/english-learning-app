@@ -54,7 +54,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       body: SafeArea(
         child: Center(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(3000),
+            // borderRadius: BorderRadius.circular(3000),
             child: SvgPicture.asset(
               Assets.logo,
               height: 200,

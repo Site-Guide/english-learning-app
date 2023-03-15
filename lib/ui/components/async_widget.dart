@@ -1,3 +1,4 @@
+import 'package:english/ui/components/logo_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -5,11 +6,12 @@ import '../../utils/labels.dart';
 
 class AsyncWidget<T> extends ConsumerWidget {
   const AsyncWidget(
-      {super.key, required this.value, required this.data, this.retry});
+      {super.key, required this.value, required this.data, this.retry, this.logoLoading = false});
 
   final AsyncValue<T> value;
   final Widget Function(T data) data;
   final VoidCallback? retry;
+  final bool logoLoading;
   @override
   Widget build(BuildContext context,WidgetRef ref) {
     return value.when(
@@ -35,7 +37,7 @@ class AsyncWidget<T> extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const Center(
+      loading: () => logoLoading? const LogoLoading(): const Center(
         child: Padding(
           padding: EdgeInsets.all(8.0),
           child: CircularProgressIndicator(),
@@ -81,7 +83,7 @@ class AsyncPage<T> extends StatelessWidget {
       },
       loading: () => Scaffold(
         appBar: AppBar(),
-        body: const Center(
+        body:  const Center(
           child: Padding(
             padding: EdgeInsets.all(8.0),
             child: CircularProgressIndicator(),

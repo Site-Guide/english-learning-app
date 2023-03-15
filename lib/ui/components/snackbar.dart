@@ -32,11 +32,11 @@ class AppSnackbar {
         content: Text(
           "$e",
           style: _styles.bodyLarge!.copyWith(
-            color: _scheme.onSecondaryContainer,
+            color: _scheme.primaryContainer,
           ),
         ),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: _scheme.secondaryContainer,
+        backgroundColor: _scheme.onPrimaryContainer,
       ),
     );
   }

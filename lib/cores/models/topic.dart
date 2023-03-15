@@ -6,6 +6,7 @@ class Topic {
   final String description;
   final String date;
   final String? courseId;
+  final String? courseName;
 
   Topic({
     required this.id,
@@ -13,6 +14,7 @@ class Topic {
     required this.description,
     required this.date,
     this.courseId,
+    this.courseName,
   });
 
   // Map<String, dynamic> toMap() {
@@ -31,7 +33,8 @@ class Topic {
       name: map['name'] ?? '',
       description: map['description'] ?? '',
       date: map['date'] ?? '',
-      courseId: map['courseId'],
+      courseId: map['courseId'] == ""? null : map['courseId'],
+      courseName: map['courseName'] == ""? null : map['courseName'],
     );
   }
 }

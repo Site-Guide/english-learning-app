@@ -10,6 +10,7 @@ import '../../../cores/models/purchase.dart';
 final purchasesProvider = FutureProvider<List<Purchase>>((ref) async {
   final user = await  ref.watch(userProvider.future);
   final repo = ref.read(purchasesRepositoryProvider);
+  print("user: ${user.email}");
   repo.initPurchases();
   return repo.listPurchases(user.$id);
 });

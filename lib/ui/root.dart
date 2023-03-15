@@ -1,3 +1,4 @@
+import 'package:english/ui/components/logo_loading.dart';
 import 'package:english/ui/quiz/quiz_page.dart';
 import 'package:english/ui/welcome/welcome_page.dart';
 import 'package:flutter/material.dart';
@@ -29,19 +30,13 @@ class Root extends ConsumerWidget {
                               child: Text("$e"),
                             ),
                           ),
-                    loading: () => const Scaffold(
-                      body: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
+                    loading: () =>
+                        const Scaffold(body: LogoLoading()),
                   )
               : const EmailVerifyPage(),
           error: (e, s) => const WelcomePage(),
           loading: () => const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
+              body: LogoLoading()),
         );
   }
 }

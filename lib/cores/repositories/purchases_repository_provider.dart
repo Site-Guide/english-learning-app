@@ -126,6 +126,9 @@ class PurchasesRepository {
         print('sync error: $e');
       }
     }
-    _ref.refresh(purchasesProvider);
+    if(puchases.isNotEmpty){
+      _ref.refresh(purchasesProvider);
+    }
+    
   }
 }

@@ -59,8 +59,6 @@ class DocRepository {
     required String databaseId,
     required String collectionId,
     List<String>? queries,
-    // Map<String, dynamic>? match,
-    // Map<String, dynamic>? contain,
   }) {
     List<Document> list = [];
     final controller = StreamController<List<Document>>();
@@ -71,40 +69,20 @@ class DocRepository {
             queries: queries)
         .then((value) {
       list.addAll(value.documents);
-      print('added list');
       controller.add(list);
     });
     final channel = 'databases.$databaseId.collections.$collectionId.documents';
     realTime.subscribe([channel]).stream.listen((event) {
           if (event.events.isNotEmpty && event.events.first.contains(channel)) {
+            print('new event: ${event.events.first}');
             final filtered =
                 event.events.where((element) => element.contains(channel));
             if (filtered.isNotEmpty) {
               final e = filtered.first;
-              print(e);
               switch (e.split('.').last) {
                 case "create":
                   Document? doc = Document.fromMap(event.payload);
-                  // if (match != null) {
-                  //   for (var entry in match.entries) {
-                  //     if (doc!.data[entry.key] != entry.value) {
-                  //       doc = null;
-                  //     }
-                  //   }
-                  // }
-                  // if (contain != null) {
-                  //   for (var entry in contain.entries) {
-                  //     if (!(doc!.data[entry.key].toString().toLowerCase())
-                  //         .contains(entry.value.toString().toLowerCase())) {
-                  //       doc = null;
-                  //     }
-                  //   }
-                  // }
-                  // print('doc: $')
-                  // if(doc!=null){
                     list.add(doc);
-                    print('added doc');
-                  // }
                   break;
                 case "update":
                   final doc = Document.fromMap(event.payload);
@@ -122,7 +100,7 @@ class DocRepository {
               controller.add(list);
             }
           }
-        });
+        },);
     return controller.stream;
   }
 }

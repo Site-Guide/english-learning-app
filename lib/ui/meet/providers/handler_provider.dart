@@ -5,6 +5,7 @@ import 'package:english/cores/models/master_data.dart';
 import 'package:english/cores/models/profile.dart';
 import 'package:english/cores/models/purchase.dart';
 import 'package:english/cores/models/topic.dart';
+import 'package:english/ui/meet/providers/sessions_stream_provider.dart';
 import 'package:english/ui/profile/providers/my_profile_provider.dart';
 import 'package:english/ui/purchases/providers/purchases_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -36,7 +37,10 @@ class MeetHandler extends ChangeNotifier {
 
   List<Topic> get elegibleTopics => _topics
       .where((topic) =>
-          topic.courseId == null  ||
+          (topic.courseId == null &&
+              elegiblePurchases
+                  .where((element) => element.type == PurchaseType.plan)
+                  .isNotEmpty) ||
           elegiblePurchases
               .where(
                 (purchase) => purchase.typeId == topic.courseId,
@@ -44,18 +48,19 @@ class MeetHandler extends ChangeNotifier {
               .isNotEmpty)
       .toList();
 
-  Topic? _selectedTopic;
-  Topic? get selectedTopic => _selectedTopic;
-  set selectedTopic(Topic? value) {
-    _selectedTopic = value;
-    notifyListeners();
+  bool isTopicElegible(String id) {
+    return elegibleTopics.where((element) => element.id == id).isNotEmpty;
   }
 
-  Purchase? get appliedPurchase => elegiblePurchases
-      .where((element) => _selectedTopic!.courseId != null
-          ? element.typeId == _selectedTopic!.courseId
-          : true)
-      .first;
+  Topic? selectedTopic;
+
+  Purchase? get appliedPurchase {
+    final list = elegiblePurchases.where((element) =>
+        selectedTopic!.courseId != null
+            ? element.typeId == selectedTopic!.courseId
+            : element.type == PurchaseType.plan);
+    return list.isNotEmpty ? list.first : null;
+  }
 
   MasterData get _masterData => _ref.read(masterDataProvider).value!;
 
@@ -64,6 +69,7 @@ class MeetHandler extends ChangeNotifier {
   int get dailyLimit => _masterData.dailyCalls[_profile.level!]!;
 
   void init() async {
+    print('init meet handler');
     await _ref.read(purchasesProvider.future);
     await _ref.read(topicsProvider.future);
     checkPermissions();
@@ -124,47 +130,17 @@ class MeetHandler extends ChangeNotifier {
 
   void startRandomJoin({
     required Function(MeetSession session) onJoin,
+    required VoidCallback onSearchEnd
   }) {
-    final user = _ref.read(userProvider).value!;
-    final stream = _repository.streamMeetSessions();
-    print('Started');
+    final stream = _ref.read(sessionsStreamProvider.stream);
+    final meets = _ref.read(sessionsStreamProvider).value?.where((element) => !element.expired).toList() ?? [];
+    handleEvents(meets, onJoin: onJoin);
     subscription = stream.listen((event) {
-      final readyMeets =
-          event.where((element) => element.isReadyForMeet(user.$id));
-      if (readyMeets.isNotEmpty) {
-        print('ready for meet');
-        final meet = readyMeets.first;
-        onJoin(meet);
-        subscription?.cancel();
-        subscription = null;
-        _timer?.cancel();
-        notifyListeners();
-        return;
-      }
-      print("No ready meets");
-      final needToWaitMeets =
-          event.where((element) => element.needToWait(user.$id));
-      if (needToWaitMeets.isNotEmpty) {
-        print("wait meets");
-        return;
-      }
-      print("No wait meets");
-      if (busy) {
-        print("Busy");
-        return;
-      }
-      final meets = event.where((element) => element.isJoinReady(limit));
-      if (meets.isNotEmpty) {
-        print('joning meet');
-        final meet = meets.first;
-        joinMeet(meet);
-      } else {
-        print('creating meet');
-        createMeet();
-      }
+      handleEvents(event, onJoin: onJoin);
     });
     notifyListeners();
     _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      onSearchEnd();
       _timer?.cancel();
       subscription?.cancel();
       subscription = null;
@@ -172,11 +148,49 @@ class MeetHandler extends ChangeNotifier {
     });
   }
 
+  void handleEvents(
+    List<MeetSession> event, {
+    required Function(MeetSession session) onJoin,
+  }) {
+    final user = _ref.read(userProvider).value!;
+    final readyMeets =
+        event.where((element) => element.isReadyForMeet(user.$id));
+    if (readyMeets.isNotEmpty) {
+      print('ready for meet');
+      final meet = readyMeets.first;
+      onJoin(meet);
+      subscription?.cancel();
+      subscription = null;
+      _timer?.cancel();
+      notifyListeners();
+      return;
+    }
+    print("No ready meets");
+    final needToWaitMeets =
+        event.where((element) => element.needToWait(user.$id));
+    if (needToWaitMeets.isNotEmpty) {
+      print("wait meets");
+      return;
+    }
+    print("No wait meets");
+    if (busy) {
+      print("Busy");
+      return;
+    }
+    final meets = event.where((element) => element.isJoinReady(limit,selectedTopic!.id));
+    if (meets.isNotEmpty) {
+      print('joning meet');
+      final meet = meets.first;
+      joinMeet(meet);
+    } else {
+      createMeet();
+    }
+  }
+
   Future<void> createMeet() async {
     busy = true;
     final user = await _ref.read(userProvider.future);
     try {
-      await Future.delayed(const Duration(seconds: 1));
       await _repository.writeMeetSession(
         MeetSession(
           id: '',

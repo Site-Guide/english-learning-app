@@ -19,39 +19,68 @@ import '../purchases/providers/purchases_provider.dart';
 import 'providers/my_attempts_today_provider.dart';
 import 'widgets/topic_card.dart';
 
-class MeetWebPage extends HookConsumerWidget {
+class MeetWebPage extends StatefulHookConsumerWidget {
   final MeetSession session;
   final Topic topic;
   final Purchase purchase;
 
-  MeetWebPage({super.key, required this.session, required this.topic,required this.purchase});
+  const MeetWebPage(
+      {super.key,
+      required this.session,
+      required this.topic,
+      required this.purchase});
 
-  late Timer _timer;
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.read(userProvider).value!;
-    useEffect(() {
-      print("done      ............");
-      ref.read(meetRepositoryProvider).createAttempt(
-            Attempt(
-              meetId: session.id,
-              userId: user.$id,
-              date: Dates.today.date,
-            ),
-          ).then((value) {
-            ref.refresh(myAttemtsTodayProvider);
-          });
-       ref.read(purchasesRepositoryProvider).increamentCallsDone(purchase).then((value) {
-        ref.refresh(purchasesProvider);
-       });
-      _timer = Timer.periodic(const Duration(minutes: 15), (timer) {
-        Navigator.pop(context);
-      });
-      return () {
-        _timer.cancel();
-      };
-    });
+  ConsumerState<ConsumerStatefulWidget> createState() => _MeetWebPageState();
+}
 
+class _MeetWebPageState extends ConsumerState<MeetWebPage> {
+  late Timer _timer;
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
+  void init() async {
+    final user = ref.read(userProvider).value!;
+
+    ref
+        .read(meetRepositoryProvider)
+        .createAttempt(
+          Attempt(
+            meetId: widget.session.id,
+            userId: user.$id,
+            date: Dates.today.date,
+          ),
+        )
+        .then((value) {
+      ref.refresh(myAttemtsTodayProvider);
+    });
+    ref
+        .read(purchasesRepositoryProvider)
+        .increamentCallsDone(widget.purchase)
+        .then((value) {
+      ref.refresh(purchasesProvider);
+    });
+    _timer = Timer.periodic(const Duration(minutes: 15), (timer) {
+      Navigator.pop(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final style = theme.textTheme;
+    final url = "https://jitsi.engexpert.in/${widget.session.id}";
     return Theme(
       data: Themes.dark,
       child: Scaffold(
@@ -62,7 +91,7 @@ class MeetWebPage extends HookConsumerWidget {
             StreamBuilder(
               stream: Stream.periodic(const Duration(seconds: 1)),
               builder: (context, snapshot) {
-                final diff = session.createdAt
+                final diff = widget.session.createdAt
                     .add(const Duration(minutes: 15))
                     .difference(DateTime.now());
                 return Text(diff.data);
@@ -75,23 +104,43 @@ class MeetWebPage extends HookConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: TopicCard(topic: topic),
+              child: TopicCard(
+                topic: widget.topic,
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.topic.name,
+                              style: style.titleMedium,
+                            ),
+                          ),
+                          CloseButton(),
+                        ],
+                      ),
+                      content: SingleChildScrollView(
+                        child: Text(
+                          "Description is the pattern of narrative development that aims to make vivid a place, object, character, or group. Description is one of four rhetorical modes, along with exposition, argumentation, and narration. In practice it would be difficult to write literature that drew on just one of the four basic modes. Description is the pattern of narrative development that aims to make vivid a place, object, character, or group. Description is one of four rhetorical modes, along with exposition, argumentation, and narration. In practice it would be difficult to write literature that drew on just one of the four basic modes. Description is the pattern of narrative development that aims to make vivid a place, object, character, or group. Description is one of four rhetorical modes, along with exposition, argumentation, and narration. In practice it would be difficult to write literature that drew on just one of the four basic modes. Description is the pattern of narrative development that aims to make vivid a place, object, character, or group. Description is one of four rhetorical modes, along with exposition, argumentation, and narration. In practice it would be difficult to write literature that drew on just one of the four basic modes.",
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
             Expanded(
               child: InAppWebView(
                 initialUrlRequest: URLRequest(
-                  url: WebUri('https://jitsi.engexpert.in/${session.id}'),
+                  url: Uri.parse(url)
                 ),
-                onPermissionRequest: (controller, permissionRequest) async {
-                  return PermissionResponse(
-                    resources: permissionRequest.resources,
-                    action: PermissionResponseAction.GRANT,
+                androidOnPermissionRequest: (controller, origin, resources) async{
+                  return PermissionRequestResponse(
+                    action: PermissionRequestResponseAction.GRANT,
+                    resources: resources,
                   );
-                },
-                shouldOverrideUrlLoading: (controller, navigationAction) async {
-                  print("##############: ${navigationAction.request.url}");
-                  Navigator.pop(context);
-                  return NavigationActionPolicy.CANCEL;
                 },
               ),
             ),
