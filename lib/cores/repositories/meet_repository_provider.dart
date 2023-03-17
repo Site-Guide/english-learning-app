@@ -1,16 +1,23 @@
+// ignore_for_file: unused_result
+
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:english/cores/models/attempt.dart';
 import 'package:english/cores/models/meet_session.dart';
-import 'package:english/cores/repositories/doc_repository_provider.dart';
+import 'package:english/cores/models/purchase.dart';
+import 'package:english/cores/repositories/purchases_repository_provider.dart';
 import 'package:english/cores/utils/ids.dart';
+import 'package:english/ui/purchases/providers/purchases_provider.dart';
+import 'package:english/utils/dates.dart';
 import 'package:english/utils/extensions.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../providers/client_provider.dart';
 import '../providers/db_provider.dart';
+import '../providers/functions_provider.dart';
 
 final meetRepositoryProvider = Provider((ref) => MeetRepsitory(ref));
 
@@ -23,29 +30,9 @@ class MeetRepsitory {
 
   Realtime get _realTime => Realtime(_ref.read(clientProvider));
 
-  // Stream<List<MeetSession>> streamMeetSessions() {
-  //   return _ref.read(docRepositoryProvider).streamDocuments(
-  //     databaseId: DBs.main,
-  //     collectionId: Collections.meetSessions,
-  //     queries: [
-  //       Query.greaterThan(
-  //         'createdAt',
-  //         DateTime.now()
-  //             .subtract(
-  //               const Duration(minutes: 1),
-  //             )
-  //             .millisecondsSinceEpoch,
-  //       ),
-  //     ],
-  //   ).map((docs) => docs
-  //       .map(
-  //         (doc) => MeetSession.fromMap(doc),
-  //       )
-  //       .toList());
-  // }
+  Functions get _functions => _ref.read(functionsProvider);
 
   Future<void> writeMeetSession(MeetSession meetSession) async {
-    print('Errrrrrrrrrr');
     if (meetSession.id.isEmpty) {
       await _db.createDocument(
         databaseId: DBs.main,
@@ -87,7 +74,6 @@ class MeetRepsitory {
   Stream<List<MeetSession>> streamMeetSessions() {
     List<Document> list = [];
     final controller = StreamController<List<MeetSession>>();
-
     _db.listDocuments(
         databaseId: DBs.main,
         collectionId: Collections.meetSessions,
@@ -110,14 +96,12 @@ class MeetRepsitory {
             .toList(),
       );
     });
-
     const channel =
         'databases.${DBs.main}.collections.${Collections.meetSessions}.documents';
     _realTime.subscribe([channel]).stream.listen(
           (event) {
             if (event.events.isNotEmpty &&
                 event.events.first.contains(channel)) {
-              print('new event: ${event.events.first}');
               final filtered =
                   event.events.where((element) => element.contains(channel));
               if (filtered.isNotEmpty) {
@@ -145,15 +129,45 @@ class MeetRepsitory {
                       (doc) => MeetSession.fromMap(doc),
                     )
                     .toList();
-                controller.add(meets
-                    .where(
-                      (element) => !element.expired
-                    )
-                    .toList());
+                controller
+                    .add(meets.where((element) => !element.expired).toList());
               }
             }
           },
         );
     return controller.stream;
+  }
+
+  Future<String> createLivekitToken(
+      {required String roomId,
+      required String identity,
+      required String name}) async {
+    try {
+      final res = await _functions.createExecution(
+        functionId: functionIds.createLivekitToken,
+        data: jsonEncode({
+          'roomId': roomId,
+          'identity': identity,
+          'name': name,
+        }),
+      );
+      final data = jsonDecode(res.response);
+      return data['token'];
+    } catch (e) {
+      return Future.error(e);
+    }
+  }
+
+  Future<void> saveAttempt(MeetSession session, Purchase purchase) async {
+    try {
+      await createAttempt(
+        Attempt(
+            meetId: session.id, userId: purchase.uid, date: Dates.today.date),
+      );
+      await _ref.read(purchasesRepositoryProvider).increamentCallsDone(purchase);
+       _ref.refresh(purchasesProvider);
+    } catch (e) {
+      return Future.error(e);
+    }
   }
 }

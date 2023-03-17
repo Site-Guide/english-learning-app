@@ -4,6 +4,7 @@ import 'package:livekit_client/livekit_client.dart';
 
 import 'no_video.dart';
 import 'participant_info.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 
 abstract class ParticipantWidget extends StatefulWidget {
   // Convenience method to return relevant widget for participant
@@ -110,11 +111,13 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget>
 
   @override
   Widget build(BuildContext ctx) => Container(
+        clipBehavior: Clip.antiAlias,
+        margin: const EdgeInsets.all(8),
         foregroundDecoration: BoxDecoration(
           border: widget.participant.isSpeaking && !widget.isScreenShare
               ? Border.all(
                   width: 5,
-                  color: Colors.blue,
+                  color: Theme.of(ctx).colorScheme.primary,
                 )
               : null,
         ),
@@ -129,6 +132,7 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget>
               child: activeVideoTrack != null && !activeVideoTrack!.muted
                   ? VideoTrackRenderer(
                       activeVideoTrack!,
+                      fit: rtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                     )
                   : const NoVideoWidget(),
             ),
@@ -143,7 +147,7 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget>
                   ...extraWidgets(widget.isScreenShare),
                   ParticipantInfoWidget(
                     title: widget.participant.name.isNotEmpty
-                        ? '${widget.participant.name} (${widget.participant.identity})'
+                        ? widget.participant.name
                         : widget.participant.identity,
                     audioAvailable: firstAudioPublication?.muted == false &&
                         firstAudioPublication?.subscribed == true,
@@ -195,18 +199,18 @@ class _RemoteParticipantWidgetState
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            // Menu for RemoteTrackPublication<RemoteAudioTrack>
-            if (firstAudioPublication != null && !isScreenShare)
-              RemoteTrackPublicationMenuWidget(
-                pub: firstAudioPublication!,
-                icon: EvaIcons.volumeUp,
-              ),
-            // Menu for RemoteTrackPublication<RemoteVideoTrack>
-            if (videoPublication != null)
-              RemoteTrackPublicationMenuWidget(
-                pub: videoPublication!,
-                icon: isScreenShare ? EvaIcons.monitor : EvaIcons.video,
-              ),
+            // // Menu for RemoteTrackPublication<RemoteAudioTrack>
+            // if (firstAudioPublication != null && !isScreenShare)
+            //   RemoteTrackPublicationMenuWidget(
+            //     pub: firstAudioPublication!,
+            //     icon: EvaIcons.volumeUp,
+            //   ),
+            // // Menu for RemoteTrackPublication<RemoteVideoTrack>
+            // if (videoPublication != null)
+            //   RemoteTrackPublicationMenuWidget(
+            //     pub: videoPublication!,
+            //     icon: isScreenShare ? EvaIcons.monitor : EvaIcons.video,
+            //   ),
             if (videoPublication != null)
               RemoteTrackFPSMenuWidget(
                 pub: videoPublication!,
@@ -272,18 +276,18 @@ class RemoteTrackFPSMenuWidget extends StatelessWidget {
           icon: Icon(icon, color: Colors.white),
           onSelected: (value) => value(),
           itemBuilder: (BuildContext context) => <PopupMenuEntry<Function>>[
-            // PopupMenuItem(
-            //   child: const Text('30'),
-            //   value: () => pub.setVideoFPS(30),
-            // ),
-            // PopupMenuItem(
-            //   child: const Text('15'),
-            //   value: () => pub.setVideoQuality(newValue)
-            // ),
-            // PopupMenuItem(
-            //   child: const Text('8'),
-            //   value: () => pub.setVideoFPS(8),
-            // ),
+            PopupMenuItem(
+              child: const Text('High'),
+              value: () => pub.setVideoQuality(VideoQuality.HIGH)
+            ),
+            PopupMenuItem(
+              child: const Text('Medium'),
+              value: () => pub.setVideoQuality(VideoQuality.MEDIUM)
+            ),
+            PopupMenuItem(
+              child: const Text('Low'),
+              value: () => pub.setVideoQuality(VideoQuality.LOW)
+            ),
           ],
         ),
       );

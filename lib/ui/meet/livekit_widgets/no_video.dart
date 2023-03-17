@@ -10,10 +10,11 @@ class NoVideoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         alignment: Alignment.center,
+        color: Theme.of(context).colorScheme.surfaceVariant,
         child: LayoutBuilder(
           builder: (ctx, constraints) => Icon(
             EvaIcons.videoOffOutline,
-            color: Colors.blue,
+            color: Theme.of(ctx).colorScheme.onSurfaceVariant,
             size: math.min(constraints.maxHeight, constraints.maxWidth) * 0.3,
           ),
         ),

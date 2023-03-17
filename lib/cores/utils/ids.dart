@@ -18,3 +18,7 @@ class Collections {
   static const razorpayPurchases = "razorpay_purchases";
   static const courses = "courses";
 }
+
+class functionIds {
+  static const createLivekitToken = "641404344429803c3cb8";
+}

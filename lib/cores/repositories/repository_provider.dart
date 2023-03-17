@@ -5,7 +5,6 @@ import 'package:english/ui/profile/providers/my_profile_provider.dart';
 import 'package:english/utils/extensions.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'dart:io' as io;
-import '../models/master_data.dart';
 import '../models/profile.dart';
 import '../models/topic.dart';
 import '../providers/db_provider.dart';
@@ -110,27 +109,6 @@ class Repository {
             )
             .toList(),
       );
-
-  // Future<void> writeQuiz() async {
-  //   try {
-  //     await _db.createDocument(
-  //       databaseId: DBs.main,
-  //       collectionId: "quiz_questions",
-  //       documentId: ID.unique(),
-  //       data: QuizQuestion(
-  //         id: '',
-  //         question: 'I read books ..... night.',
-  //         options: {
-  //           "0": "In the night",
-  //           "1": "At night",
-  //         },
-  //         answer: "1",
-  //       ).toMap(),
-  //     );
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
 
   Future<List<QuizQuestion>> listQuizQuestions() async {
     return _db

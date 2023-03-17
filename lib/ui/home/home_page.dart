@@ -1,9 +1,6 @@
 // ignore_for_file: unused_result
 
 import 'package:english/ui/home/coming_soon_page.dart';
-import 'package:english/ui/home/widgets/home_view.dart';
-import 'package:english/ui/meet/connect_page.dart';
-import 'package:english/ui/meet/meet_init_page.dart';
 import 'package:english/ui/meet/select_topic_page.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -141,8 +138,7 @@ class _HomePageState extends ConsumerState<HomePage>
       ),
       body: [
         SelectTopicPage(),
-        // ComingSoonPage(label: 'Courses',),
-        const ConnectPage(),
+        ComingSoonPage(label: 'Courses',),
         const ComingSoonPage(label: "Discussions",),
         const ProfilePage(),
       ][index.value],

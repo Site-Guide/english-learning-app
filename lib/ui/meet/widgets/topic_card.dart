@@ -8,7 +8,7 @@ class TopicCard extends StatelessWidget {
       required this.topic,
       this.selected = false,
       this.onTap,
-      this.noTap = true});
+      this.noTap = false});
   final Topic topic;
   final bool selected;
   final VoidCallback? onTap;
@@ -62,7 +62,7 @@ class TopicCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               ReadMoreText(
-                "Description is the pattern of narrative development that aims to make vivid a place, object, character, or group. Description is one of four rhetorical modes, along with exposition, argumentation, and narration. In practice it would be difficult to write literature that drew on just one of the four basic modes.",
+                topic.description,
                 trimLines: 2,
                 style: style.bodySmall,
                 trimLength: 100,

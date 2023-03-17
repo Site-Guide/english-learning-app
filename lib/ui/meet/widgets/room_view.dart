@@ -1,34 +1,30 @@
-
-
 import 'dart:convert';
 import 'dart:math' as math;
 
-import 'package:english/ui/meet/live_widgets/exts.dart';
+import 'package:english/ui/meet/livekit_widgets/exts.dart';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
 
-import 'live_widgets/controlls.dart';
-import 'live_widgets/participant.dart';
-import 'live_widgets/participant_info.dart';
+import '../livekit_widgets/controlls.dart';
+import '../livekit_widgets/participant.dart';
+import '../livekit_widgets/participant_info.dart';
 
-
-
-class RoomPage extends StatefulWidget {
+class RoomView extends StatefulWidget {
   //
   final Room room;
   final EventsListener<RoomEvent> listener;
 
-  const RoomPage(
+  const RoomView(
     this.room,
     this.listener, {
     Key? key,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _RoomPageState();
+  State<StatefulWidget> createState() => _RoomViewState();
 }
 
-class _RoomPageState extends State<RoomPage> {
+class _RoomViewState extends State<RoomView> {
   //
   List<ParticipantTrack> participantTracks = [];
   EventsListener<RoomEvent> get _listener => widget.listener;
@@ -83,7 +79,6 @@ class _RoomPageState extends State<RoomPage> {
   void _askPublish() async {
     final result = await context.showPublishDialog();
     if (result != true) return;
-    // video will fail when running in ios simulator
     try {
       await widget.room.localParticipant?.setCameraEnabled(true);
     } catch (error) {
@@ -124,7 +119,6 @@ class _RoomPageState extends State<RoomPage> {
     }
     // sort speakers for the grid
     userMediaTracks.sort((a, b) {
-      // loudest speaker first
       if (a.participant.isSpeaking && b.participant.isSpeaking) {
         if (a.participant.audioLevel > b.participant.audioLevel) {
           return -1;
@@ -175,33 +169,31 @@ class _RoomPageState extends State<RoomPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Column(
-          children: [
-            Expanded(
-                child: participantTracks.isNotEmpty
-                    ? ParticipantWidget.widgetFor(participantTracks.first)
-                    : Container()),
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: math.max(0, participantTracks.length - 1),
-                itemBuilder: (BuildContext context, int index) => SizedBox(
-                  width: 100,
-                  height: 100,
-                  child:
-                      ParticipantWidget.widgetFor(participantTracks[index + 1]),
-                ),
+  Widget build(BuildContext context) => Column(
+        children: [
+          Expanded(
+            child: participantTracks.isNotEmpty
+                ? ParticipantWidget.widgetFor(participantTracks.first)
+                : Container(),
+          ),
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: math.max(0, participantTracks.length - 1),
+              itemBuilder: (BuildContext context, int index) => SizedBox(
+                width: 100,
+                height: 100,
+                child:
+                    ParticipantWidget.widgetFor(participantTracks[index + 1]),
               ),
             ),
-            if (widget.room.localParticipant != null)
-              SafeArea(
-                top: false,
-                child:
-                    ControlsWidget(widget.room, widget.room.localParticipant!),
-              ),
-          ],
-        ),
+          ),
+          if (widget.room.localParticipant != null)
+            SafeArea(
+              top: false,
+              child: ControlsWidget(widget.room, widget.room.localParticipant!),
+            ),
+        ],
       );
 }

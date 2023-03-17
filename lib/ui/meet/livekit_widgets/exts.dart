@@ -55,20 +55,26 @@ extension LKExampleExt on BuildContext {
 
   Future<bool?> showDisconnectDialog() => showDialog<bool>(
         context: this,
-        builder: (ctx) => AlertDialog(
+        builder: (ctx) {
+          final theme = Theme.of(ctx);
+          final scheme = theme.colorScheme;
+          return AlertDialog(
           title: const Text('Disconnect'),
-          content: const Text('Are you sure to disconnect?'),
+          content: const Text('Are you sure you want to disconnect from room?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
               child: const Text('Cancel'),
             ),
-            TextButton(
+            MaterialButton(
+              color: scheme.errorContainer,
+              textColor: scheme.onErrorContainer,
               onPressed: () => Navigator.pop(ctx, true),
               child: const Text('Disconnect'),
             ),
           ],
-        ),
+        );
+        }
       );
 
   Future<bool?> showReconnectDialog() => showDialog<bool>(

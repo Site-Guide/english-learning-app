@@ -28,8 +28,12 @@ class ParticipantInfoWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Container(
-        color: Colors.black.withOpacity(0.3),
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final style = theme.textTheme;
+    return Container(
+        color: scheme.onSurface.withOpacity(0.3),
         padding: const EdgeInsets.symmetric(
           vertical: 7,
           horizontal: 10,
@@ -43,14 +47,17 @@ class ParticipantInfoWidget extends StatelessWidget {
                 child: Text(
                   title!,
                   overflow: TextOverflow.ellipsis,
+                  style: style.titleSmall!.copyWith(
+                    color: scheme.surface,
+                  ),
                 ),
               ),
             isScreenShare
-                ? const Padding(
-                    padding: EdgeInsets.only(left: 5),
+                ?  Padding(
+                    padding: const EdgeInsets.only(left: 5),
                     child: Icon(
                       EvaIcons.monitor,
-                      color: Colors.white,
+                      color: scheme.surface,
                       size: 16,
                     ),
                   )
@@ -80,4 +87,5 @@ class ParticipantInfoWidget extends StatelessWidget {
           ],
         ),
       );
+  }
 }

@@ -27,8 +27,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final base = ThemeData.light(useMaterial3: true).textTheme;
     final colorScheme =
-        ColorScheme.fromSeed(seedColor: Color(0xFF0077B6)).copyWith(
-      primary: Color(0xFF0077B6),
+        ColorScheme.fromSeed(seedColor: const Color(0xFF0077B6)).copyWith(
+      primary: const Color(0xFF0077B6),
     );
     return MaterialApp(
       debugShowCheckedModeBanner: false,

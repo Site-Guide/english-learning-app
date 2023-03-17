@@ -10,6 +10,7 @@ import 'package:english/ui/profile/providers/my_profile_provider.dart';
 import 'package:english/ui/purchases/providers/purchases_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../cores/models/meet_session.dart';
@@ -69,7 +70,6 @@ class MeetHandler extends ChangeNotifier {
   int get dailyLimit => _masterData.dailyCalls[_profile.level!]!;
 
   void init() async {
-    print('init meet handler');
     await _ref.read(purchasesProvider.future);
     await _ref.read(topicsProvider.future);
     checkPermissions();
@@ -128,15 +128,36 @@ class MeetHandler extends ChangeNotifier {
   StreamSubscription<List<MeetSession>>? subscription;
   Timer? _timer;
 
-  void startRandomJoin({
-    required Function(MeetSession session) onJoin,
-    required VoidCallback onSearchEnd
-  }) {
+  bool _callLoading = false;
+
+
+
+  bool get loading => subscription != null || _callLoading;
+
+  void startRandomJoin(
+      {required       Function(
+             MeetSession session,
+               Topic topic,
+               Purchase purchase,
+               Room room,
+               EventsListener<RoomEvent> listener)
+          onJoin,
+      required VoidCallback onSearchEnd}) {
     final stream = _ref.read(sessionsStreamProvider.stream);
-    final meets = _ref.read(sessionsStreamProvider).value?.where((element) => !element.expired).toList() ?? [];
-    handleEvents(meets, onJoin: onJoin);
+    final meets = _ref
+            .read(sessionsStreamProvider)
+            .value
+            ?.where((element) => !element.expired)
+            .toList() ??
+        [];
+
+    handleEvents(meets, (session) {
+      joinRoom(session, onJoin);
+    });
     subscription = stream.listen((event) {
-      handleEvents(event, onJoin: onJoin);
+      handleEvents(event, (session) {
+        joinRoom(session, onJoin);
+      });
     });
     notifyListeners();
     _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
@@ -149,16 +170,15 @@ class MeetHandler extends ChangeNotifier {
   }
 
   void handleEvents(
-    List<MeetSession> event, {
-    required Function(MeetSession session) onJoin,
-  }) {
+      List<MeetSession> event, Function(MeetSession session) onMeet) {
     final user = _ref.read(userProvider).value!;
     final readyMeets =
         event.where((element) => element.isReadyForMeet(user.$id));
     if (readyMeets.isNotEmpty) {
       print('ready for meet');
       final meet = readyMeets.first;
-      onJoin(meet);
+      onMeet(meet);
+      _callLoading = true;
       subscription?.cancel();
       subscription = null;
       _timer?.cancel();
@@ -177,11 +197,12 @@ class MeetHandler extends ChangeNotifier {
       print("Busy");
       return;
     }
-    final meets = event.where((element) => element.isJoinReady(limit,selectedTopic!.id));
+    final meets =
+        event.where((element) => element.isJoinReady(limit, selectedTopic!.id));
     if (meets.isNotEmpty) {
       print('joning meet');
       final meet = meets.first;
-      joinMeet(meet);
+      participate(meet);
     } else {
       createMeet();
     }
@@ -210,7 +231,9 @@ class MeetHandler extends ChangeNotifier {
     }
   }
 
-  Future<void> joinMeet(MeetSession meetSession) async {
+  Future<void> participate(
+    MeetSession meetSession,
+  ) async {
     busy = true;
     final user = await _ref.read(userProvider.future);
     final updated = meetSession.copyWith(
@@ -229,5 +252,49 @@ class MeetHandler extends ChangeNotifier {
       busy = false;
       return Future.error(e);
     }
+  }
+
+  Future<void> joinRoom(
+      MeetSession session,
+      Function(
+             MeetSession session,
+               Topic topic,
+               Purchase purchase,
+               Room room,
+               EventsListener<RoomEvent> listener)
+          onJoin) async {
+    final token = await _repository.createLivekitToken(
+      roomId: session.id,
+      identity: _profile.id,
+      name: _profile.name,
+    );
+    final room = Room();
+    // Create a Listener before connecting
+    final listener = room.createListener();
+    await room.connect(
+      "wss://livekit.engexpert.in",
+      token,
+      roomOptions: const RoomOptions(
+        adaptiveStream: true,
+        dynacast: true,
+        defaultVideoPublishOptions: VideoPublishOptions(
+          simulcast: true,
+        ),
+        defaultScreenShareCaptureOptions:
+            ScreenShareCaptureOptions(useiOSBroadcastExtension: true),
+      ),
+      fastConnectOptions: FastConnectOptions(
+        microphone: const TrackOption(enabled: true),
+        camera: const TrackOption(enabled: true),
+      ),
+    );
+    onJoin(
+       session,
+      selectedTopic!,
+       appliedPurchase!,
+      room,
+     listener,
+    );
+    _callLoading = false;
   }
 }

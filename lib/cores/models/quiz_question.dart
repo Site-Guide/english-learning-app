@@ -8,6 +8,7 @@ class QuizQuestion {
   final Map<String, String> options;
   final String ans;
   final int index;
+  
   QuizQuestion({
     required this.id,
     required this.question,
