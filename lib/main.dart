@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
         extensions: [darkCustomColors],
         // cardColor: Colors.black,
-        appBarTheme: const AppBarTheme(
+        appBarTheme:  AppBarTheme(
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
             statusBarIconBrightness: Brightness.dark,
@@ -78,7 +78,7 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(
           centerTitle: true,
           titleTextStyle:
-              TextStyle(fontSize: 18, color: lightColorScheme.onSurface),
+              TextStyle(fontSize: 18, color: colorScheme.onSurface),
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarIconBrightness: Brightness.dark,
             statusBarColor: Colors.transparent,

@@ -100,12 +100,14 @@ class MeetRepsitory {
         'databases.${DBs.main}.collections.${Collections.meetSessions}.documents';
     _realTime.subscribe([channel]).stream.listen(
           (event) {
+            print("event: ${event.events.length}");
             if (event.events.isNotEmpty &&
                 event.events.first.contains(channel)) {
               final filtered =
                   event.events.where((element) => element.contains(channel));
               if (filtered.isNotEmpty) {
                 final e = filtered.first;
+                print(e);
                 switch (e.split('.').last) {
                   case "create":
                     Document? doc = Document.fromMap(event.payload);
@@ -129,6 +131,8 @@ class MeetRepsitory {
                       (doc) => MeetSession.fromMap(doc),
                     )
                     .toList();
+                print("meets: ${meets.length}");
+                print(meets.where((element) => !element.expired).toList().length);
                 controller
                     .add(meets.where((element) => !element.expired).toList());
               }

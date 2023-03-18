@@ -1,5 +1,5 @@
-import 'package:english/cores/models/meet_session.dart';
 import 'package:english/ui/components/app_button.dart';
+import 'package:english/ui/components/async_widget.dart';
 import 'package:english/ui/components/logo_loading.dart';
 import 'package:english/ui/components/snackbar.dart';
 import 'package:english/ui/meet/providers/sessions_stream_provider.dart';
@@ -23,11 +23,10 @@ class MeetInitPage extends HookConsumerWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final style = theme.textTheme;
-    ref.read(sessionsStreamProvider);
     final model = ref.watch(meetHandlerProvider);
     final user = ref.read(userProvider).value!;
     final masterData = ref.read(masterDataProvider).value!;
-
+    print(model.subscription != null);
     Widget buildBody() {
       if (model.camera == null || model.audio == null) {
         return const LogoLoading();
@@ -52,7 +51,7 @@ class MeetInitPage extends HookConsumerWidget {
                       TopicCard(
                         topic: model.selectedTopic!,
                       ),
-                      ...{2: "2 Members", 5: "5 Members", null: "Group"}
+                      ...{2: "2 Members", null: "Group call upto 5 members"}
                           .entries
                           .map(
                             (e) => RadioListTile<int?>(
@@ -69,46 +68,56 @@ class MeetInitPage extends HookConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16).copyWith(top: 0),
-                  child: AppButton(
-                    label: "Join",
-                    onPressed: model.selectedTopic != null
-                        ? () {
-                            model.startRandomJoin(
-                              onJoin: ( session,  topic,  purchase,  room,  listener) {
-                                return Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return MeetRoomPage(
-                                        room: room,
-                                        listener: listener,
-                                        session: session,
-                                        topic: model.selectedTopic!,
-                                        purchase: model.appliedPurchase!,
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                              onSearchEnd: () {
-                                AppSnackbar(context).message(
-                                  'Sorry, No members available to call for this topic. Please try again or select different topic.',
-                                );
-                              },
-                            );
-                          }
-                        : null,
+                  child: AsyncWidget(
+                    value: ref.watch(sessionsStreamProvider),
+                    data: (data) => AppButton(
+                      label: "Join",
+                      onPressed: model.selectedTopic != null
+                          ? () {
+                              model.startRandomJoin(
+                                onJoin:
+                                    (session, topic, purchase, room, listener) {
+                                  return Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return MeetRoomPage(
+                                          room: room,
+                                          listener: listener,
+                                          session: session,
+                                          topic: model.selectedTopic!,
+                                          purchase: model.appliedPurchase!,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                onSearchEnd: () {
+                                  AppSnackbar(context).message(
+                                    'Sorry, No members available to call for this topic. Please try again or select different topic.',
+                                  );
+                                },
+                              );
+                            }
+                          : null,
+                    ),
                   ),
                 )
               ],
             );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Join Practice Call'),
+    return WillPopScope(
+      onWillPop: () async{
+        model.back();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Join Practice Call'),
+        ),
+        body: SafeArea(child: buildBody()),
       ),
-      body: SafeArea(child: buildBody()),
     );
   }
 }

@@ -15,7 +15,7 @@ class MeetSession {
   final DateTime createdAt;
   final List<String> participants;
 
-  bool get isFull => limit != null && participants.length >= limit!;
+  bool get isFull => participants.length >= (limit ?? 5);
 
   bool isJoinReady(int? limit,String topicId) => !isFull && !expired && this.limit == limit && topicId == this.topicId;
 

@@ -3,41 +3,36 @@ import 'package:english/cores/enums/level.dart';
 
 class Profile {
   final String id;
-  final String name;
-  final String email;
-  final String? image;
-  final String phone;
-  final String whatsapp;
-  final String profession;
-  final String purpose;
-  final Level? level;
-  final int quizTimeSpend;
+   String name;
+   String email;
+   String? image;
+   String phone;
+   String whatsapp;
+   String profession;
+   String purpose;
+   Level? level;
+   int quizTimeSpend;
+   String experience;
+   String haveYou;
+   String lookingFor;
+   final bool isAdmin;
 
   Profile({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.phone,
-    required this.whatsapp,
-    required this.profession,
-    required this.purpose,
+    this.id = '',
+    this.name = '',
+    this.email = '',
+    this.phone = '',
+    this.whatsapp = '',
+    this.profession = '',
+    this.purpose = '',
     this.image,
     this.level,
     this.quizTimeSpend = 0,
+    this.experience = '',
+    this.haveYou = '',
+    this.lookingFor = '',
+    this.isAdmin = false,
   });
-
-  factory Profile.empty() {
-    return Profile(
-      id: '',
-      name: '',
-      email: '',
-      phone: '',
-      whatsapp: '',
-      profession: '',
-      purpose: '',
-      quizTimeSpend: 0,
-    );
-  }
 
   Profile copyWith({
     String? id,
@@ -49,6 +44,9 @@ class Profile {
     String? profession,
     String? purpose,
     Level? level,
+    String? experience,
+    String? haveYou,
+    String? lookingFor,
   }) {
     return Profile(
       id: id ?? this.id,
@@ -60,6 +58,9 @@ class Profile {
       profession: profession ?? this.profession,
       purpose: purpose ?? this.purpose,
       level: level ?? this.level,
+      experience: experience ?? this.experience,
+      haveYou: haveYou ?? this.haveYou,
+      lookingFor: lookingFor ?? this.lookingFor,
     );
   }
 
@@ -74,6 +75,10 @@ class Profile {
       'purpose': purpose,
       "level": level?.name,
       'quizTimeSpend': quizTimeSpend,
+      'experience': experience,
+      'haveYou': haveYou,
+      'lookingFor': lookingFor,
+      'isAdmin': isAdmin,
     };
   }
 
@@ -89,10 +94,14 @@ class Profile {
       profession: map['profession'] ?? '',
       purpose: map['purpose'] ?? '',
       level: Level.values.cast<Level?>().firstWhere(
-        (e) => e?.name == map['level'],
-        orElse: () => null,
-      ),
+            (e) => e?.name == map['level'],
+            orElse: () => null,
+          ),
       quizTimeSpend: map['quizTimeSpend'] ?? 0,
+      experience: map['experience'] ?? '',
+      haveYou: map['haveYou'] ?? '',
+      lookingFor: map['lookingFor'] ?? '',
+      isAdmin: map['isAdmin'] ?? false,
     );
   }
 }

@@ -248,6 +248,7 @@ class TopicTile extends ConsumerWidget {
           ),
           borderRadius: BorderRadius.circular(8),
         ),
+        margin: EdgeInsets.zero,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

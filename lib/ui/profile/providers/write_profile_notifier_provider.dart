@@ -16,7 +16,7 @@ class WriteProfileNotifier extends ChangeNotifier {
 
   WriteProfileNotifier(this._ref);
 
-  Profile? initial;
+  Profile profile = Profile();
 
   static const List<String> options = [
     "Working Professional",
@@ -25,61 +25,12 @@ class WriteProfileNotifier extends ChangeNotifier {
     "Business Owner",
   ];
 
-  String _phone = '';
-  String get phone => _phone;
-  set phone(String phone) {
-    _phone = phone;
-    notifyListeners();
-  }
 
-  String _whatsapp = '';
-  String get whatsapp => _whatsapp;
-  set whatsapp(String whatsapp) {
-    _whatsapp = whatsapp;
-    notifyListeners();
-  }
-
-  String _profession = '';
-  String get profession => _profession;
-  set profession(String profession) {
-    _profession = profession;
-    if(options.contains(profession)){
-      _other = false;
-    }
-    notifyListeners();
-  }
-
-  bool _other = false;
-  bool get other => _other;
-  set other(bool other) {
-    _other = other;
-    _profession = '';
-    notifyListeners();
-  }
-
-  String _purpose = '';
-  String get purpose => _purpose;
-  set purpose(String purpose) {
-    _purpose = purpose;
-    notifyListeners();
-  }
 
   void init(Profile profile) {
-    if (initial == null) {
-      initial = profile;
-      _phone = profile.phone;
-      _whatsapp = profile.whatsapp;
-      _profession = profile.profession;
-      _purpose = profile.purpose;
-      _other = !options.contains(profession);
-    }
+    this.profile = profile;
   }
 
-  bool get enabled =>
-      _phone.isNotEmpty &&
-      _whatsapp.isNotEmpty &&
-      _profession.isNotEmpty &&
-      _purpose.isNotEmpty;
 
   File? _file;
   File? get file => _file;
@@ -89,7 +40,22 @@ class WriteProfileNotifier extends ChangeNotifier {
   }
 
   void clear() {
-    initial = null;
+    profile = Profile();
+  }
+
+  void setAreYou(String value){
+    profile.profession = value;
+    _other = false;
+    notifyListeners();
+  }
+  
+
+  bool _other = false;
+  bool get other => _other;
+  set other(bool value) {
+    _other = value;
+    profile.profession = "";
+    notifyListeners();
   }
 
   Repository get _repository => _ref.read(repositoryProvider);
@@ -99,14 +65,10 @@ class WriteProfileNotifier extends ChangeNotifier {
   Future<void> write({bool skip = false}) async {
     _loading.start();
     final user = _ref.read(userProvider).value!;
-    final updated = (initial ?? Profile.empty()).copyWith(
+    final updated = profile.copyWith(
       name: user.name,
       email: user.email,
       id: user.$id,
-      phone: phone,
-      whatsapp: whatsapp,
-      profession: profession,
-      purpose: purpose,
     );
     try {
       await _repository.writeProfile(updated, file: skip ? null : file);

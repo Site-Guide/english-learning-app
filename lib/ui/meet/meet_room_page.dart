@@ -56,6 +56,7 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
   @override
   void dispose() {
     _timer.cancel();
+    widget.room.disconnect();
     super.dispose();
   }
 

@@ -87,13 +87,13 @@ class PurchasesRepository {
         queries: [
           Query.equal('email', user.email),
         ]);
-
+    print('razorpay purchases: ${response.documents.length}');
     final puchases = response.documents
         .map(
           (e) => RazorpayPurchase.fromMap(e),
         )
         .toList();
-
+     
     for (final purchase in puchases) {
       try {
         final courses = await _db.listDocuments(
@@ -103,6 +103,7 @@ class PurchasesRepository {
             Query.equal('price', purchase.amount),
           ],
         );
+        print('courses: ${courses.documents.length}');
         if (courses.documents.isEmpty) {
           continue;
         }
@@ -121,7 +122,9 @@ class PurchasesRepository {
           uid: user.$id,
         );
         await createPurchase(updated);
+        print('purchase created: ${updated.id}');
         await deleteRazorpayPurchase(purchase.id);
+        print('razorpay purchase deleted: ${purchase.id}');
       } catch (e) {
         print('sync error: $e');
       }

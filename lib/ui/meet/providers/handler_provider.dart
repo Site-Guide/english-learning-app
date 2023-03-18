@@ -130,17 +130,11 @@ class MeetHandler extends ChangeNotifier {
 
   bool _callLoading = false;
 
-
-
   bool get loading => subscription != null || _callLoading;
 
   void startRandomJoin(
-      {required       Function(
-             MeetSession session,
-               Topic topic,
-               Purchase purchase,
-               Room room,
-               EventsListener<RoomEvent> listener)
+      {required Function(MeetSession session, Topic topic, Purchase purchase,
+              Room room, EventsListener<RoomEvent> listener)
           onJoin,
       required VoidCallback onSearchEnd}) {
     final stream = _ref.read(sessionsStreamProvider.stream);
@@ -151,51 +145,60 @@ class MeetHandler extends ChangeNotifier {
             .toList() ??
         [];
 
-    handleEvents(meets, (session) {
-      joinRoom(session, onJoin);
-    });
-    subscription = stream.listen((event) {
-      handleEvents(event, (session) {
-        joinRoom(session, onJoin);
+    final meet = handleEvents(meets);
+    print("meet: $meet");
+    if (meet != null) {
+      print("meet: ${meet.id}");
+      joinRoom(meet, onJoin);
+    } else {
+      subscription = stream.listen((event) {
+        print("event: ${event.length}");
+        final meet = handleEvents(event);
+        if (meet != null) {
+          joinRoom(meet, onJoin);
+        }
       });
-    });
-    notifyListeners();
-    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      onSearchEnd();
-      _timer?.cancel();
-      subscription?.cancel();
-      subscription = null;
       notifyListeners();
-    });
+      _timer = Timer(const Duration(minutes: 1), () {
+        onSearchEnd();
+        _timer?.cancel();
+        subscription?.cancel();
+        subscription = null;
+        notifyListeners();
+      });
+    }
   }
 
-  void handleEvents(
-      List<MeetSession> event, Function(MeetSession session) onMeet) {
+  MeetSession? handleEvents(List<MeetSession> event) {
     final user = _ref.read(userProvider).value!;
+    print(user.$id);
+    print(event.length);
     final readyMeets =
         event.where((element) => element.isReadyForMeet(user.$id));
+    print("ready meets: ${readyMeets.length}");
     if (readyMeets.isNotEmpty) {
       print('ready for meet');
       final meet = readyMeets.first;
-      onMeet(meet);
       _callLoading = true;
       subscription?.cancel();
       subscription = null;
+      print("canceling subscription");
+      print(subscription == null);
       _timer?.cancel();
       notifyListeners();
-      return;
+      return meet;
     }
     print("No ready meets");
     final needToWaitMeets =
         event.where((element) => element.needToWait(user.$id));
     if (needToWaitMeets.isNotEmpty) {
       print("wait meets");
-      return;
+      return null;
     }
     print("No wait meets");
     if (busy) {
       print("Busy");
-      return;
+      return null;
     }
     final meets =
         event.where((element) => element.isJoinReady(limit, selectedTopic!.id));
@@ -206,11 +209,13 @@ class MeetHandler extends ChangeNotifier {
     } else {
       createMeet();
     }
+    return null;
   }
 
   Future<void> createMeet() async {
     busy = true;
     final user = await _ref.read(userProvider.future);
+    print("creating meet");
     try {
       await _repository.writeMeetSession(
         MeetSession(
@@ -222,6 +227,7 @@ class MeetHandler extends ChangeNotifier {
           topicId: selectedTopic!.id,
         ),
       );
+      print("meet created");
       await Future.delayed(const Duration(seconds: 1));
       busy = false;
     } catch (e) {
@@ -256,12 +262,8 @@ class MeetHandler extends ChangeNotifier {
 
   Future<void> joinRoom(
       MeetSession session,
-      Function(
-             MeetSession session,
-               Topic topic,
-               Purchase purchase,
-               Room room,
-               EventsListener<RoomEvent> listener)
+      Function(MeetSession session, Topic topic, Purchase purchase, Room room,
+              EventsListener<RoomEvent> listener)
           onJoin) async {
     final token = await _repository.createLivekitToken(
       roomId: session.id,
@@ -288,13 +290,21 @@ class MeetHandler extends ChangeNotifier {
         camera: const TrackOption(enabled: true),
       ),
     );
+
     onJoin(
-       session,
+      session,
       selectedTopic!,
-       appliedPurchase!,
+      appliedPurchase!,
       room,
-     listener,
+      listener,
     );
+    print('joined 1');
     _callLoading = false;
+  }
+
+  void back(){
+    subscription?.cancel();
+    subscription = null;
+    _timer?.cancel();
   }
 }
