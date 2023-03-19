@@ -17,10 +17,10 @@ class NoVideoWidget extends StatelessWidget {
               ? Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
-                    "Shivkumar Konade",
+                    name,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: constraints.maxHeight * 0.15,
+                      fontSize: constraints.maxHeight * 0.1,
                       fontWeight: FontWeight.bold,
                       color: scheme.onSurfaceVariant,
                     ),

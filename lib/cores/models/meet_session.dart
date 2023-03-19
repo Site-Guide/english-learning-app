@@ -16,7 +16,7 @@ class MeetSession {
 
   bool get isFull => participants.length >= (limit ?? 5);
 
-  bool isJoinReady(int? limit,String topicId) => !isFull && !expired && this.limit == limit && topicId == this.topicId;
+  bool isJoinReady(int? limit, String topicId) => !isFull && !expired && this.limit == limit && topicId == this.topicId;
 
   bool get expired =>
       createdAt.isBefore(DateTime.now().subtract(const Duration(minutes: 1)));
@@ -25,13 +25,13 @@ class MeetSession {
 //TODO: update this
   bool isReadyForMeet(String id) =>
       !expired &&
-      (participants.length >= (limit ?? 1)) &&
+      (participants.length >= (limit ?? 2)) &&
       participants.contains(id);
 
 //TODO: update this
   bool needToWait(String id) =>
       !expired &&
-      (participants.length < (limit ?? 1)) &&
+      (participants.length < (limit ?? 2)) &&
       participants.contains(id);
 
   MeetSession({

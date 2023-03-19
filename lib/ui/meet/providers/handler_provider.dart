@@ -301,7 +301,7 @@ class MeetHandler extends ChangeNotifier {
     _callLoading = false;
   }
 
-  void back(){
+  void back() {
     subscription?.cancel();
     subscription = null;
     _timer?.cancel();
