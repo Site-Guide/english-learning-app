@@ -206,6 +206,12 @@ class MeetHandler extends ChangeNotifier {
       print('joning meet');
       final meet = meets.first;
       participate(meet);
+            subscription?.cancel();
+      subscription = null;
+      _timer?.cancel();
+      _callLoading = true;
+      notifyListeners();
+      return meet;
     } else {
       createMeet();
     }
