@@ -52,10 +52,15 @@ class TopicCard extends StatelessWidget {
                           ),
                     const SizedBox(width: 8),
                   ],
-                  Text(
-                    topic.name,
-                    style: style.titleLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      
+                      topic.name,
+                      style: style.titleLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: noTap? 2: null,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

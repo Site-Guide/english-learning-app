@@ -3,6 +3,7 @@ import 'package:english/ui/components/async_widget.dart';
 import 'package:english/ui/components/logo_loading.dart';
 import 'package:english/ui/components/snackbar.dart';
 import 'package:english/ui/meet/providers/sessions_stream_provider.dart';
+import 'package:english/ui/meet/widgets/feedback_dialog.dart';
 import 'package:english/ui/meet/widgets/topic_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -76,8 +77,8 @@ class MeetInitPage extends HookConsumerWidget {
                           ? () {
                               model.startRandomJoin(
                                 onJoin:
-                                    (session, topic, purchase, room, listener) {
-                                  return Navigator.pushReplacement(
+                                    (session, topic, purchase, room, listener)async  {
+                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) {

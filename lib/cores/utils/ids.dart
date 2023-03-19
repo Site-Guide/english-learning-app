@@ -17,6 +17,7 @@ class Collections {
   static const purchases = "purchases";
   static const razorpayPurchases = "razorpay_purchases";
   static const courses = "courses";
+  static const feedbacks = "feedbacks";
 }
 
 class functionIds {

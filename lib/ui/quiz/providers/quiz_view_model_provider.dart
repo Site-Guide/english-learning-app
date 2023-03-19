@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final quizViewModelProvider = ChangeNotifierProvider(
-  (ref) => QuizViewModel(ref),
+  (ref) => QuizViewModel(ref)..init(),
 );
 
 class QuizViewModel extends ChangeNotifier {
@@ -21,26 +21,32 @@ class QuizViewModel extends ChangeNotifier {
 
   DateTime? startedAt;
 
+  bool get active => startedAt != null;
+
   late Timer _timer;
-  late Duration _totalDuration;
+  late Duration totalDuration;
   late Duration _remainingDuration;
+
+  bool loading = true;
 
   List<QuizQuestion> questions = [];
 
   DateTime get endedAt => startedAt!.add(_remainingDuration);
 
   Duration get timeLeft => endedAt.difference(DateTime.now());
-  Duration get timeSpend => _totalDuration - timeLeft;
-  bool initialized = false;
+  Duration get timeSpend => totalDuration - timeLeft;
 
-  void init(VoidCallback onTimeOut) async {
-    if (initialized) return;
-    initialized = true;
+  void init() async {
     questions = await _repository.listQuizQuestions();
-    _totalDuration = Duration(seconds: questions.length * 90);
+    totalDuration = Duration(seconds: questions.length * 90);
+    loading = false;
+    notifyListeners();
+  }
+
+  void start(VoidCallback onTimeOut) async {
     final profile = await _ref.read(profileProvider.future);
     final spend = Duration(seconds: profile.quizTimeSpend);
-    _remainingDuration = _totalDuration - spend;
+    _remainingDuration = totalDuration - spend;
     startedAt = DateTime.now();
     _timer = Timer(_remainingDuration, () {
       onTimeOut();
@@ -50,7 +56,7 @@ class QuizViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    _repository.updateTimeSpend(timeSpend);
+    submit();
     _timer.cancel();
     super.dispose();
   }

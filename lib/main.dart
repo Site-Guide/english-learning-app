@@ -56,6 +56,7 @@ class MyApp extends StatelessWidget {
             .copyWith(
               displayMedium: const TextStyle(fontWeight: FontWeight.bold),
               headlineLarge: const TextStyle(fontWeight: FontWeight.bold),
+              headlineSmall: const TextStyle(fontWeight: FontWeight.bold),
               titleLarge: const TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -106,9 +107,10 @@ class MyApp extends StatelessWidget {
             .copyWith(
               displayMedium: const TextStyle(fontWeight: FontWeight.bold),
               headlineLarge: const TextStyle(fontWeight: FontWeight.bold),
+              headlineSmall: const TextStyle(fontWeight: FontWeight.bold),
               titleLarge: const TextStyle(
-                  // fontWeight: FontWeight.bold,
-                  ),
+                fontWeight: FontWeight.bold,
+              ),
               titleMedium: const TextStyle(
                 fontWeight: FontWeight.w600,
               ),

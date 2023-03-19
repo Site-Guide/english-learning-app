@@ -134,7 +134,7 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget>
                       activeVideoTrack!,
                       fit: rtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                     )
-                  : const NoVideoWidget(),
+                  :  NoVideoWidget(name: widget.participant.name),
             ),
 
             // Bottom bar

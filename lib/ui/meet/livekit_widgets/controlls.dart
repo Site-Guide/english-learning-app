@@ -255,48 +255,40 @@ class _ControlsWidgetState extends State<ControlsWidget> {
         vertical: 15,
         horizontal: 15,
       ),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: 5,
-        runSpacing: 5,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          IconButton(
-            iconSize: 32,
+          MaterialButton(
+            padding: const EdgeInsets.all(16),
+            textColor: colors.onRed,
             color: colors.sourceRed,
             onPressed: _onTapDisconnect,
-            icon: const Icon(EvaIcons.closeCircle),
-            tooltip: 'Disconnect',
+            child: const Icon(Icons.call_end_rounded),
           ),
-          const SizedBox(width: 16),
-
+          const SizedBox(width: 12),
           if (participant.isMicrophoneEnabled())
-            IconButton(
-              iconSize: 32,
+            CircleButton(
               onPressed: _disableAudio,
-              icon: const Icon(EvaIcons.mic),
-              tooltip: 'mute audio',
+              icon: const Icon(
+                EvaIcons.mic,
+                size: 32,
+              ),
             )
           else
-            IconButton(
-              iconSize: 32,
+            CircleButton(
               onPressed: _enableAudio,
-              icon: const Icon(EvaIcons.micOff),
-              tooltip: 'un-mute audio',
+              icon: const Icon(EvaIcons.micOff, size: 32),
             ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
           if (participant.isCameraEnabled())
-            IconButton(
-              iconSize: 32,
+            CircleButton(
               onPressed: _disableVideo,
-              icon: const Icon(EvaIcons.video),
-              tooltip: 'mute video',
+              icon: const Icon(EvaIcons.video,size: 32,),
             )
           else
-            IconButton(
-              iconSize: 32,
+            CircleButton(
               onPressed: _enableVideo,
-              icon: const Icon(EvaIcons.videoOff),
-              tooltip: 'un-mute video',
+              icon: const Icon(EvaIcons.videoOff,size: 32,),
             ),
           // IconButton(
           //   onPressed: _onTapSendData,
@@ -305,6 +297,24 @@ class _ControlsWidgetState extends State<ControlsWidget> {
           // ),
         ],
       ),
+    );
+  }
+}
+
+class CircleButton extends StatelessWidget {
+  const CircleButton({super.key, required this.icon, required this.onPressed});
+  final Widget icon;
+  final VoidCallback onPressed;
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        shape: const CircleBorder(),
+        padding: const EdgeInsets.all(12),
+      ),
+      onPressed: onPressed,
+      child: icon,
+      // tooltip: 'mute audio',
     );
   }
 }

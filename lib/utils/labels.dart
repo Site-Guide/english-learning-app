@@ -67,6 +67,7 @@ class Labels {
   static const String signInWithGoogle = "Sign in with Google";
   static const String signUp = "Sign Up";
   static const String skip = "Skip";
+  static const String startQuiz = "Start Quiz";
   static const String submit = "Submit";
   static const String update = "Update";
   static const String urghhYou =

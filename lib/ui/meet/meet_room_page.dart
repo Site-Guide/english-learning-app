@@ -85,11 +85,20 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
                     child: Text(
                       completed ? "00:00:00" : diff.data,
                       style: style.labelMedium!.copyWith(
-                        color: completed? scheme.error: scheme.primary,
+                        color: completed ? scheme.error : scheme.primary,
                       ),
                     ),
                   );
                 },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Text(
+                'Note: The meeting is being recorded. Please maintenance the decorum.',
+                style: style.bodySmall!.copyWith(
+                  color: scheme.error,
+                ),
               ),
             ),
             TopicCard(
@@ -104,7 +113,7 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
                         Expanded(
                           child: Text(
                             widget.topic.name,
-                            style: style.titleMedium,
+                            style: style.titleLarge,
                           ),
                         ),
                         const CloseButton(),
@@ -113,6 +122,7 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
                     content: SingleChildScrollView(
                       child: Text(
                         widget.topic.description,
+                        style: style.bodyLarge,
                       ),
                     ),
                   ),

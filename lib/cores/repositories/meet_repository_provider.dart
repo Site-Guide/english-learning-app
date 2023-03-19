@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:english/cores/models/attempt.dart';
+import 'package:english/cores/models/feedback.dart';
 import 'package:english/cores/models/meet_session.dart';
 import 'package:english/cores/models/purchase.dart';
 import 'package:english/cores/repositories/purchases_repository_provider.dart';
@@ -173,5 +174,14 @@ class MeetRepsitory {
     } catch (e) {
       return Future.error(e);
     }
+  }
+
+  Future<void> createFeedback(Feedback feedback){
+    return _db.createDocument(
+      databaseId: DBs.main,
+      collectionId: Collections.feedbacks,
+      documentId: ID.unique(),
+      data: feedback.toMap(),
+    );
   }
 }

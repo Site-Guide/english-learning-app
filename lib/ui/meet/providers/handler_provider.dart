@@ -220,7 +220,6 @@ class MeetHandler extends ChangeNotifier {
       await _repository.writeMeetSession(
         MeetSession(
           id: '',
-          topic: selectedTopic!.name,
           limit: limit,
           participants: [user.$id],
           createdAt: DateTime.now(),

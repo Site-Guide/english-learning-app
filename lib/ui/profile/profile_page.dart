@@ -24,27 +24,27 @@ class ProfilePage extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(8),
         children: [
-          // const SizedBox(height: 8),
-          // Center(
-          //   child: Column(
-          //     children: [
-          //       // ProfileAvatar(
-          //       //   profile: profile,
-          //       //   radius: 32,
-          //       // ),
-          //       const SizedBox(height: 16),
-          //       Text(
-          //         user.name,
-          //         style: style.titleLarge,
-          //       ),
-          //       const SizedBox(height: 12),
-          //       Text(
-          //         user.email,
-          //       ),
-          //       const SizedBox(height: 8),
-          //     ],
-          //   ),
-          // ),
+          const SizedBox(height: 8),
+          Center(
+            child: Column(
+              children: [
+                // ProfileAvatar(
+                //   profile: profile,
+                //   radius: 32,
+                // ),
+                const SizedBox(height: 16),
+                Text(
+                  user.name,
+                  style: style.titleLarge,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  user.email,
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
           // const SizedBox(height: 16),
           // ListTile(
           //   title: Text("Plans"),

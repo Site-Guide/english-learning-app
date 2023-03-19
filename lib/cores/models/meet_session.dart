@@ -9,7 +9,6 @@ enum MeetSessionStatus {
 
 class MeetSession {
   final String id;
-  final String topic;
   final String topicId;
   final int? limit;
   final DateTime createdAt;
@@ -22,19 +21,21 @@ class MeetSession {
   bool get expired =>
       createdAt.isBefore(DateTime.now().subtract(const Duration(minutes: 1)));
 
+
+//TODO: update this
   bool isReadyForMeet(String id) =>
       !expired &&
-      (participants.length >= (limit ?? 2)) &&
+      (participants.length >= (limit ?? 1)) &&
       participants.contains(id);
 
+//TODO: update this
   bool needToWait(String id) =>
       !expired &&
-      (participants.length < (limit ?? 2)) &&
+      (participants.length < (limit ?? 1)) &&
       participants.contains(id);
 
   MeetSession({
     required this.id,
-    required this.topic,
     required this.topicId,
     this.limit,
     required this.createdAt,
@@ -43,7 +44,6 @@ class MeetSession {
 
   Map<String, dynamic> toMap() {
     return {
-      'topic': topic,
       'limit': limit,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'participants': participants,
@@ -55,7 +55,6 @@ class MeetSession {
     final Map<String, dynamic> map = doc.data;
     return MeetSession(
       id: doc.$id,
-      topic: map['topic'] ?? '',
       limit: map['limit']?.toInt(),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
       participants: List<String>.from(map['participants']),
@@ -73,7 +72,6 @@ class MeetSession {
   }) {
     return MeetSession(
       id: id ?? this.id,
-      topic: topic ?? this.topic,
       limit: limit ?? this.limit,
       createdAt: createdAt ?? this.createdAt,
       participants: participants ?? this.participants,

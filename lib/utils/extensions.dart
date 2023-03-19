@@ -11,12 +11,10 @@ extension Crim on String? {
   }
 }
 
-
 extension IntNull on int {
   int? get crim => this == 0 ? null : this;
   String get asRupee => '₹$this';
 }
-
 
 extension Typee on String {
   String get types => split('-').first;
@@ -47,6 +45,13 @@ extension OnDuration on Duration {
     final minutes = inMinutes - hours * 60;
     final seconds = inSeconds - hours * 3600 - minutes * 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
 
+  String get format {
+    final hours = inHours;
+    final minutes = inMinutes - hours * 60;
+    final seconds = inSeconds - hours * 3600 - minutes * 60;
+    return '${hours != 0 ? "${hours.toString().padLeft(2, '0')} hours" : ""}${minutes != 0 ? " ${minutes.toString().padLeft(2, '0')} minutes" : ''} ${seconds != 0 ? " ${seconds.toString().padLeft(2, '0')} seconds" : ''}'
+        .trim();
   }
 }
