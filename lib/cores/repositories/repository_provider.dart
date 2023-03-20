@@ -110,6 +110,14 @@ class Repository {
             .toList(),
       );
 
+  Future<Topic> getTopic (String id) => _db.getDocument(
+    databaseId: DBs.main,
+    collectionId: "topics",
+    documentId: id,
+  ).then(
+        (value) => Topic.fromMap(value),
+      );
+
   Future<List<QuizQuestion>> listQuizQuestions() async {
     return _db
         .listDocuments(

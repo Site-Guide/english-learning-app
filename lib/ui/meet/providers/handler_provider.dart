@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:english/cores/enums/purchase_type.dart';
+import 'package:english/cores/models/call_request.dart';
 import 'package:english/cores/models/master_data.dart';
 import 'package:english/cores/models/profile.dart';
 import 'package:english/cores/models/purchase.dart';
 import 'package:english/cores/models/topic.dart';
-import 'package:english/ui/meet/providers/sessions_stream_provider.dart';
+import 'package:english/cores/providers/loading_provider.dart';
+import 'package:english/cores/providers/messaging_provider.dart';
+import 'package:english/ui/meet/providers/my_attempts_today_provider.dart';
 import 'package:english/ui/profile/providers/my_profile_provider.dart';
 import 'package:english/ui/purchases/providers/purchases_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -13,11 +16,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../../cores/models/meet_session.dart';
 import '../../../cores/providers/master_data_provider.dart';
 import '../../../cores/repositories/meet_repository_provider.dart';
 import '../../auth/providers/user_provider.dart';
-import '../../home/providers/topic_provider.dart';
+import 'topics_provider.dart';
 
 final meetHandlerProvider =
     ChangeNotifierProvider.autoDispose((ref) => MeetHandler(ref)..init());
@@ -93,7 +95,7 @@ class MeetHandler extends ChangeNotifier {
     notifyListeners();
   }
 
-  void request() async {
+  void requestPermissions() async {
     List<Permission> list = [Permission.camera, Permission.microphone];
     final map = await list.request();
     map.forEach((key, value) {
@@ -112,204 +114,85 @@ class MeetHandler extends ChangeNotifier {
   PermissionStatus? audio;
   PermissionStatus? camera;
 
-  int? _limit = 2;
-  int? get limit => _limit;
-  set limit(int? value) {
+  int _limit = 2;
+  int get limit => _limit;
+  set limit(int value) {
     _limit = value;
     notifyListeners();
   }
 
-  bool busy = false;
-
-  String? joinedId;
-
   MeetRepsitory get _repository => _ref.read(meetRepositoryProvider);
 
-  StreamSubscription<List<MeetSession>>? subscription;
-  Timer? _timer;
+  Loading get loading => _ref.read(loadingProvider);
 
-  bool _callLoading = false;
-
-  bool get loading => subscription != null || _callLoading;
-
-  void startRandomJoin(
-      {required Function(MeetSession session, Topic topic, Purchase purchase,
-              Room room, EventsListener<RoomEvent> listener)
-          onJoin,
-      required VoidCallback onSearchEnd}) {
-    final stream = _ref.read(sessionsStreamProvider.stream);
-    final meets = _ref
-            .read(sessionsStreamProvider)
-            .value
-            ?.where((element) => !element.expired)
-            .toList() ??
-        [];
-
-    final meet = handleEvents(meets);
-    print("meet: $meet");
-    if (meet != null) {
-      print("meet: ${meet.id}");
-      joinRoom(meet, onJoin);
-    } else {
-      subscription = stream.listen((event) {
-        print("event: ${event.length}");
-        final meet = handleEvents(event);
-        if (meet != null) {
-          joinRoom(meet, onJoin);
-        }
-      });
-      notifyListeners();
-      _timer = Timer(const Duration(minutes: 1), () {
-        onSearchEnd();
-        _timer?.cancel();
-        subscription?.cancel();
-        subscription = null;
-        notifyListeners();
-      });
-    }
+  bool _joinLoading = false;
+  bool get joinLoading => _joinLoading;
+  set joinLoading(bool value) {
+    _joinLoading = value;
+    notifyListeners();
   }
 
-  MeetSession? handleEvents(List<MeetSession> event) {
-    final user = _ref.read(userProvider).value!;
-    print(user.$id);
-    print(event.length);
-    final readyMeets =
-        event.where((element) => element.isReadyForMeet(user.$id));
-    print("ready meets: ${readyMeets.length}");
-    if (readyMeets.isNotEmpty) {
-      print('ready for meet');
-      final meet = readyMeets.first;
-      _callLoading = true;
-      subscription?.cancel();
-      subscription = null;
-      print("canceling subscription");
-      print(subscription == null);
-      _timer?.cancel();
-      notifyListeners();
-      return meet;
-    }
-    print("No ready meets");
-    final needToWaitMeets =
-        event.where((element) => element.needToWait(user.$id));
-    if (needToWaitMeets.isNotEmpty) {
-      print("wait meets");
-      return null;
-    }
-    print("No wait meets");
-    if (busy) {
-      print("Busy");
-      return null;
-    }
-    final meets =
-        event.where((element) => element.isJoinReady(limit, selectedTopic!.id));
-    if (meets.isNotEmpty) {
-      print('joning meet');
-      final meet = meets.first;
-      participate(meet);
-            subscription?.cancel();
-      subscription = null;
-      _timer?.cancel();
-      _callLoading = true;
-      notifyListeners();
-      return meet;
-    } else {
-      createMeet();
-    }
-    return null;
-  }
-
-  Future<void> createMeet() async {
-    busy = true;
+  Future<void> request() async {
+    loading.start();
     final user = await _ref.read(userProvider.future);
-    print("creating meet");
     try {
-      await _repository.writeMeetSession(
-        MeetSession(
+      final fcmToken = await _ref.read(messagingProvider).getToken();
+      if (fcmToken == null) {
+        return Future.error("Failed to get fcm token!");
+      }
+      await _repository.writeRequest(
+        CallRequest(
           id: '',
           limit: limit,
-          participants: [user.$id],
           createdAt: DateTime.now(),
           topicId: selectedTopic!.id,
+          uid: user.$id,
+          fcmToken: fcmToken,
+          name: user.name,
+          purchaseId: appliedPurchase!.id,
         ),
       );
-      print("meet created");
-      await Future.delayed(const Duration(seconds: 1));
-      busy = false;
+      _ref.refresh(requestsProvider);
+      loading.end();
     } catch (e) {
-      print(e);
-      busy = false;
-      return Future.error(e);
-    }
-  }
-
-  Future<void> participate(
-    MeetSession meetSession,
-  ) async {
-    busy = true;
-    final user = await _ref.read(userProvider.future);
-    final updated = meetSession.copyWith(
-      participants: [
-        ...meetSession.participants,
-        user.$id,
-      ],
-    );
-    try {
-      await _repository.writeMeetSession(
-        updated,
-      );
-      await Future.delayed(const Duration(seconds: 1));
-      busy = false;
-    } catch (e) {
-      busy = false;
+      loading.stop();
       return Future.error(e);
     }
   }
 
   Future<void> joinRoom(
-      MeetSession session,
-      Function(MeetSession session, Topic topic, Purchase purchase, Room room,
-              EventsListener<RoomEvent> listener)
-          onJoin) async {
-    final token = await _repository.createLivekitToken(
-      roomId: session.id,
-      identity: _profile.id,
-      name: _profile.name,
-    );
-    final room = Room();
-    // Create a Listener before connecting
-    final listener = room.createListener();
-    await room.connect(
-      "wss://livekit.engexpert.in",
-      token,
-      roomOptions: const RoomOptions(
-        adaptiveStream: true,
-        dynacast: true,
-        defaultVideoPublishOptions: VideoPublishOptions(
-          simulcast: true,
+    String token,
+    Function(Room room, EventsListener<RoomEvent> listener) onJoin,
+  ) async {
+    try {
+      final room = Room();
+      joinLoading = true;
+      final listener = room.createListener();
+      await room.connect(
+        "wss://livekit.engexpert.in",
+        token,
+        roomOptions: const RoomOptions(
+          adaptiveStream: true,
+          dynacast: true,
+          defaultVideoPublishOptions: VideoPublishOptions(
+            simulcast: true,
+          ),
+          defaultScreenShareCaptureOptions:
+              ScreenShareCaptureOptions(useiOSBroadcastExtension: true),
         ),
-        defaultScreenShareCaptureOptions:
-            ScreenShareCaptureOptions(useiOSBroadcastExtension: true),
-      ),
-      fastConnectOptions: FastConnectOptions(
-        microphone: const TrackOption(enabled: true),
-        camera: const TrackOption(enabled: true),
-      ),
-    );
-
-    onJoin(
-      session,
-      selectedTopic!,
-      appliedPurchase!,
-      room,
-      listener,
-    );
-    print('joined 1');
-    _callLoading = false;
-  }
-
-  void back() {
-    subscription?.cancel();
-    subscription = null;
-    _timer?.cancel();
+        fastConnectOptions: FastConnectOptions(
+          microphone: const TrackOption(enabled: true),
+          camera: const TrackOption(enabled: true),
+        ),
+      );
+      onJoin(
+        room,
+        listener,
+      );
+      _joinLoading = false;
+    } catch (e) {
+      _joinLoading = false;
+      return Future.error(e);
+    }
   }
 }

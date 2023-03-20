@@ -1,12 +1,18 @@
 // ignore_for_file: unused_result
 
 import 'package:english/ui/home/coming_soon_page.dart';
+import 'package:english/ui/home/widgets/message_dialog.dart';
+import 'package:english/ui/meet/meet_room_page.dart';
+import 'package:english/ui/meet/providers/handler.dart';
 import 'package:english/ui/meet/select_topic_page.dart';
+import 'package:english/ui/meet/widgets/meet_dialog.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../cores/providers/links_provider.dart';
+import '../../cores/providers/messaging_provider.dart';
 import '../profile/profile_page.dart';
 
 class HomePage extends StatefulHookConsumerWidget {
@@ -30,6 +36,7 @@ class _HomePageState extends ConsumerState<HomePage>
     // linkSubscription = _links.onLink.listen((event) {
     //   handleLink(event);
     // });
+    initMessaging();
     super.initState();
   }
 
@@ -47,9 +54,38 @@ class _HomePageState extends ConsumerState<HomePage>
     }
   }
 
+  void initMessaging() async {
+    final messaging = ref.read(messagingProvider);
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    ref.read(callHandlerProvider).initMessaging(
+      onJoin: (call) {
+        showDialog(
+          context: context,
+          builder: (context) => MeetDialog(
+            call: call,
+          ),
+        );
+      },
+      onCallFailed: (title, body) {
+        showDialog(
+          context: context,
+          builder: (context) => MessageDialog(title: title, body: body),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
-    // linkSubscription.cancel();
+    ref.read(callHandlerProvider).dispose();
     super.dispose();
   }
 
@@ -138,8 +174,12 @@ class _HomePageState extends ConsumerState<HomePage>
       ),
       body: [
         SelectTopicPage(),
-        ComingSoonPage(label: 'Courses',),
-        const ComingSoonPage(label: "Discussions",),
+        ComingSoonPage(
+          label: 'Courses',
+        ),
+        const ComingSoonPage(
+          label: "Discussions",
+        ),
         const ProfilePage(),
       ][index.value],
     );

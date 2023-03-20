@@ -6,10 +6,8 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../components/app_button.dart';
 import '../providers/handler_provider.dart';
 
-
-
-class PermissionsPage extends ConsumerWidget {
-  const PermissionsPage({super.key});
+class PermissionsView extends ConsumerWidget {
+  const PermissionsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -56,7 +54,7 @@ class PermissionsPage extends ConsumerWidget {
             padding: const EdgeInsets.all(16.0).copyWith(top: 0),
             child: AppButton(
               label: "Allow",
-              onPressed: model.request,
+              onPressed: model.requestPermissions,
             ),
           ),
       ],

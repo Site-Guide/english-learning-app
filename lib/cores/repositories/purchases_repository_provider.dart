@@ -59,16 +59,34 @@ class PurchasesRepository {
         .toList();
   }
 
-  Future<void> increamentCallsDone(Purchase purchase) async {
-    purchase.callsDone++;
-    await _db.updateDocument(
-        databaseId: DBs.main,
-        documentId: purchase.id,
-        collectionId: Collections.purchases,
-        data: {
-          'callsDone': purchase.callsDone,
-        });
-    _ref.refresh(purchasesProvider);
+  Future<void> increamentCallsDone(String id) async {
+    try {
+      final purchases = await _ref.read(purchasesProvider.future);
+      final filtered = purchases.where((element) => element.id == id).toList();
+      late Purchase purchase;
+      if (filtered.isNotEmpty) {
+        purchase = filtered.first;
+      } else {
+        final response = await _db.getDocument(
+          databaseId: DBs.main,
+          documentId: id,
+          collectionId: Collections.purchases,
+        );
+        purchase = Purchase.fromMap(response);
+      }
+      print('purchase: ${purchase.toMap()}');
+      purchase.callsDone++;
+      await _db.updateDocument(
+          databaseId: DBs.main,
+          documentId: purchase.id,
+          collectionId: Collections.purchases,
+          data: {
+            'callsDone': purchase.callsDone,
+          });
+      _ref.refresh(purchasesProvider);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> deleteRazorpayPurchase(String id) async {
@@ -93,7 +111,7 @@ class PurchasesRepository {
           (e) => RazorpayPurchase.fromMap(e),
         )
         .toList();
-     
+
     for (final purchase in puchases) {
       try {
         final courses = await _db.listDocuments(
@@ -129,9 +147,8 @@ class PurchasesRepository {
         print('sync error: $e');
       }
     }
-    if(puchases.isNotEmpty){
+    if (puchases.isNotEmpty) {
       _ref.refresh(purchasesProvider);
     }
-    
   }
 }

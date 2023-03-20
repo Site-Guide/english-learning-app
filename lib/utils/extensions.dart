@@ -47,6 +47,13 @@ extension OnDuration on Duration {
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
+  String get miniData {
+    final hours = inHours;
+    final minutes = inMinutes - hours * 60;
+    final seconds = inSeconds - hours * 3600 - minutes * 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
   String get format {
     final hours = inHours;
     final minutes = inMinutes - hours * 60;

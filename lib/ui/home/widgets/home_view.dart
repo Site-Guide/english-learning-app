@@ -1,6 +1,6 @@
 import 'package:english/cores/providers/master_data_provider.dart';
 import 'package:english/ui/components/async_widget.dart';
-import 'package:english/ui/home/providers/topic_provider.dart';
+import 'package:english/ui/meet/providers/topics_provider.dart';
 import 'package:english/ui/home/widgets/timing_view.dart';
 import 'package:english/ui/meet/meet_init_page.dart';
 import 'package:english/ui/packages/package_page.dart';

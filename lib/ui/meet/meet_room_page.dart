@@ -1,29 +1,30 @@
 import 'dart:async';
 
-import 'package:english/cores/models/meet_session.dart';
-import 'package:english/cores/models/purchase.dart';
-import 'package:english/cores/models/topic.dart';
-import 'package:english/cores/repositories/meet_repository_provider.dart';
+import 'package:english/cores/models/call.dart';
+import 'package:english/cores/repositories/purchases_repository_provider.dart';
 import 'package:english/ui/meet/widgets/room_view.dart';
-import 'package:english/ui/meet/widgets/topic_card.dart';
+import 'package:english/ui/purchases/providers/purchases_provider.dart';
 import 'package:english/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:wakelock/wakelock.dart';
 
+import 'providers/topic_provider.dart';
+import 'widgets/topic_card.dart';
+
 class MeetRoomPage extends StatefulHookConsumerWidget {
-  final MeetSession session;
-  final Topic topic;
-  final Purchase purchase;
+  final JoinCall call;
+  // final Topic topic;
+  // final Purchase purchase;
   final Room room;
   final EventsListener<RoomEvent> listener;
 
   const MeetRoomPage({
     super.key,
-    required this.session,
-    required this.topic,
-    required this.purchase,
+    required this.call,
+    // required this.topic,
+    // required this.purchase,
     required this.room,
     required this.listener,
   });
@@ -41,16 +42,16 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
     super.initState();
   }
 
+  DateTime startedAt = DateTime.now();
+
   void init() async {
     Wakelock.enable();
-    ref
-        .read(meetRepositoryProvider)
-        .saveAttempt(widget.session, widget.purchase);
     _timer = Timer.periodic(const Duration(minutes: 15), (timer) {
       widget.room.disconnect().then((value) {
         Wakelock.disable();
       });
     });
+    ref.read(purchasesRepositoryProvider).increamentCallsDone(widget.call.purchaseId);
   }
 
   @override
@@ -75,7 +76,7 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
               child: StreamBuilder(
                 stream: Stream.periodic(const Duration(seconds: 1)),
                 builder: (context, snapshot) {
-                  final diff = widget.session.createdAt
+                  final diff = startedAt
                       .add(const Duration(minutes: 15))
                       .difference(DateTime.now());
                   final completed = diff.isNegative;
@@ -101,32 +102,40 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
                 ),
               ),
             ),
-            TopicCard(
-              topic: widget.topic,
-              noTap: true,
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            widget.topic.name,
-                            style: style.titleLarge,
-                          ),
-                        ),
-                        const CloseButton(),
-                      ],
-                    ),
-                    content: SingleChildScrollView(
-                      child: Text(
-                        widget.topic.description,
-                        style: style.bodyLarge,
-                      ),
-                    ),
-                  ),
-                );
+            Consumer(
+              builder: (context, ref, child) {
+                final topic =
+                    ref.watch(topicProvider(widget.call.topicId)).asData?.value;
+                return topic != null
+                    ? TopicCard(
+                        topic: topic,
+                        noTap: true,
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      topic.name,
+                                      style: style.titleLarge,
+                                    ),
+                                  ),
+                                  const CloseButton(),
+                                ],
+                              ),
+                              content: SingleChildScrollView(
+                                child: Text(
+                                  topic.description,
+                                  style: style.bodyLarge,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : const SizedBox();
               },
             ),
             Expanded(
