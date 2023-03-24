@@ -1,3 +1,4 @@
+import 'package:english/ui/home/providers/notification_settings_provider.dart';
 import 'package:english/utils/assets.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
@@ -29,9 +30,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     try {
       await ref.read(cacheProvider.future);
       await ref.read(masterDataProvider.future);
+      await ref.read(notificationSettingsProvider.future);
       await ref.read(userProvider.future);
       await ref.read(purchasesProvider.future);
-      await Future.delayed(const Duration(seconds: 1));
     } catch (e) {
       debugPrint("$e");
     }

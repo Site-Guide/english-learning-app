@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:english/cores/models/call.dart';
+import 'package:english/cores/repositories/meet_repository_provider.dart';
 import 'package:english/cores/repositories/purchases_repository_provider.dart';
+import 'package:english/ui/meet/providers/handler.dart';
 import 'package:english/ui/meet/widgets/room_view.dart';
 import 'package:english/ui/purchases/providers/purchases_provider.dart';
 import 'package:english/utils/extensions.dart';
@@ -45,6 +47,7 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
   DateTime startedAt = DateTime.now();
 
   void init() async {
+    // ref.read(callHandlerProvider).inCall = true;
     Wakelock.enable();
     _timer = Timer.periodic(const Duration(minutes: 15), (timer) {
       widget.room.disconnect().then((value) {
@@ -52,6 +55,7 @@ class _MeetWebPageState extends ConsumerState<MeetRoomPage> {
       });
     });
     ref.read(purchasesRepositoryProvider).increamentCallsDone(widget.call.purchaseId);
+    ref.read(meetRepositoryProvider).joined(widget.call.requestId);
   }
 
   @override

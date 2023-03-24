@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'package:english/cores/models/call.dart';
+import 'package:english/cores/providers/loading_provider.dart';
+import 'package:english/cores/providers/messaging_provider.dart';
 import 'package:english/ui/meet/providers/my_attempts_today_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:livekit_client/livekit_client.dart';
 
-import '../../../cores/providers/messaging_provider.dart';
-
-final callHandlerProvider =
-    ChangeNotifierProvider.autoDispose((ref) => CallHandler(ref));
+final callHandlerProvider = ChangeNotifierProvider((ref) => CallHandler(ref));
 
 enum MeetStatus { init, meet }
 
@@ -20,14 +18,16 @@ class CallHandler extends ChangeNotifier {
 
   late StreamSubscription<RemoteMessage> _subscription;
 
-  void initMessaging({
-    required Function(JoinCall call)
-        onJoin,
-    required Function(String title, String body) onCallFailed,
 
+  void initMessaging({
+    required Function(JoinCall call) onJoin,
+    required Function(String title, String body) onCallFailed,
   }) {
+    _ref.read(messagingProvider).subscribeToTopic('call');
     _subscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('got message: /////////');
+      // if (inCall) {
+      //   return;
+      // }
       final type = message.data['type'];
       if (type == 'call') {
         final String token = message.data['token']!;
@@ -54,6 +54,13 @@ class CallHandler extends ChangeNotifier {
       _ref.refresh(requestsProvider);
     });
   }
+
+  // bool inCall = false;
+
+  // void onCallEnd() {
+  //   print('onCallEnd');
+  //   inCall = false;
+  // }
 
   void disposeMessaging() {
     _subscription.cancel();

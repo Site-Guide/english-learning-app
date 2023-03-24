@@ -11,6 +11,9 @@ class CallRequest {
   final String fcmToken;
   final String name;
   final String purchaseId;
+  final bool joined;
+  final bool shown;
+  final String? token;
 
   CallRequest({
     this.id = '',
@@ -22,6 +25,9 @@ class CallRequest {
     required this.fcmToken,
     required this.name,
     required this.purchaseId,
+    this.joined = false,
+    this.shown = false,
+    this.token,
   });
 
   Map<String, dynamic> toMap() {
@@ -35,6 +41,9 @@ class CallRequest {
       'fcmToken': fcmToken,
       'name': name,
       'purchaseId': purchaseId,
+      'joined': joined,
+      'shown': shown,
+      'token': token
     };
   }
 
@@ -50,6 +59,9 @@ class CallRequest {
       fcmToken: map['fcmToken'] ?? '',
       name: map['name'] ?? '',
       purchaseId: map['purchaseId'] ?? '',
+      joined: map['joined'],
+      shown: map['shown'],
+      token: map['token'],
     );
   }
 

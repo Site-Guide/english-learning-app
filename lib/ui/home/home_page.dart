@@ -1,5 +1,6 @@
 // ignore_for_file: unused_result
 
+import 'package:english/cores/utils/extensions.dart';
 import 'package:english/ui/home/coming_soon_page.dart';
 import 'package:english/ui/home/widgets/message_dialog.dart';
 import 'package:english/ui/meet/meet_room_page.dart';
@@ -13,6 +14,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../cores/providers/links_provider.dart';
 import '../../cores/providers/messaging_provider.dart';
+import '../../cores/repositories/meet_repository_provider.dart';
+import '../meet/providers/handler_provider.dart';
+import '../meet/providers/my_attempts_today_provider.dart';
 import '../profile/profile_page.dart';
 
 class HomePage extends StatefulHookConsumerWidget {
@@ -55,37 +59,35 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   void initMessaging() async {
-    final messaging = ref.read(messagingProvider);
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    ref.read(callHandlerProvider).initMessaging(
-      onJoin: (call) {
-        showDialog(
-          context: context,
-          builder: (context) => MeetDialog(
-            call: call,
-          ),
-        );
-      },
-      onCallFailed: (title, body) {
-        showDialog(
-          context: context,
-          builder: (context) => MessageDialog(title: title, body: body),
-        );
-      },
-    );
+    // ref.read(callHandlerProvider).initMessaging(
+    //   onJoin: (call) {
+    //     ref.read(meetRepositoryProvider).shown(call.requestId);
+    //     final model = ref.read(meetHandlerProvider);
+    //     model.joinRoom(call.token, (room, listener) {
+    //       Navigator.push(
+    //         context,
+    //         MaterialPageRoute(
+    //           builder: (context) => MeetRoomPage(
+    //             call: call,
+    //             room: room,
+    //             listener: listener,
+    //           ),
+    //         ),
+    //       );
+    //     });
+    //   },
+    //   onCallFailed: (title, body) {
+    //     showDialog(
+    //       context: context,
+    //       builder: (context) => MessageDialog(title: title, body: body),
+    //     );
+    //   },
+    // );
   }
 
   @override
   void dispose() {
-    ref.read(callHandlerProvider).dispose();
+    // ref.read(callHandlerProvider).disposeMessaging();
     super.dispose();
   }
 
@@ -156,6 +158,9 @@ class _HomePageState extends ConsumerState<HomePage>
         selectedItemColor: scheme.secondary,
         unselectedItemColor: scheme.secondary.withOpacity(0.4),
         onTap: (value) {
+          if (ref.read(requestsProvider).asData?.value.hasPending ?? false) {
+            return;
+          }
           index.value = value;
         },
         type: BottomNavigationBarType.fixed,

@@ -54,49 +54,25 @@ class MeetRepsitory {
     );
   }
 
-  // Future<void> createAttempt(Attempt attempt) async {
-  //   await _db.createDocument(
-  //     databaseId: DBs.main,
-  //     collectionId: Collections.attempts,
-  //     documentId: ID.unique(),
-  //     data: attempt.toMap(),
-  //   );
-  // }
+  Future<void> joined(String id) async {
+    await _db.updateDocument(
+        databaseId: DBs.main,
+        collectionId: Collections.callRequests,
+        documentId: id,
+        data: {
+          'joined': true,
+        });
+  }
 
-  // Future<String> createLivekitToken(
-  //     {required String roomId,
-  //     required String identity,
-  //     required String name}) async {
-  //   try {
-  //     final res = await _functions.createExecution(
-  //       functionId: functionIds.createLivekitToken,
-  //       data: jsonEncode({
-  //         'roomId': roomId,
-  //         'identity': identity,
-  //         'name': name,
-  //       }),
-  //     );
-  //     final data = jsonDecode(res.response);
-  //     return data['token'];
-  //   } catch (e) {
-  //     return Future.error(e);
-  //   }
-  // }
-
-  // Future<void> saveAttempt(MeetSession session, Purchase purchase) async {
-  //   try {
-  //     await createAttempt(
-  //       Attempt(
-  //           meetId: session.id, userId: purchase.uid, date: Dates.today.date),
-  //     );
-  //     await _ref
-  //         .read(purchasesRepositoryProvider)
-  //         .increamentCallsDone(purchase);
-  //     _ref.refresh(purchasesProvider);
-  //   } catch (e) {
-  //     return Future.error(e);
-  //   }
-  // }
+  Future<void> shown(String id) async {
+    await _db.updateDocument(
+        databaseId: DBs.main,
+        collectionId: Collections.callRequests,
+        documentId: id,
+        data: {
+          'shown': true,
+        });
+  }
 
   Future<void> createFeedback(Feedback feedback) {
     return _db.createDocument(

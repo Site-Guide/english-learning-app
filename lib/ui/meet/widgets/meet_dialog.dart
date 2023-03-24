@@ -1,11 +1,13 @@
 import 'package:english/cores/models/call.dart';
+import 'package:english/cores/repositories/meet_repository_provider.dart';
 import 'package:english/ui/meet/meet_room_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../providers/handler_provider.dart';
 
-class MeetDialog extends ConsumerWidget {
+class MeetDialog extends HookConsumerWidget {
   const MeetDialog({super.key, required this.call});
 
   final JoinCall call;
@@ -14,6 +16,10 @@ class MeetDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    useEffect(() {
+      ref.read(meetRepositoryProvider).shown(call.requestId);
+      return () {};
+    }, const []);
     final model = ref.watch(meetHandlerProvider);
     return AlertDialog(
       // backgroundColor: scheme.surface,

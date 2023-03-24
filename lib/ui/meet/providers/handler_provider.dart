@@ -165,6 +165,7 @@ class MeetHandler extends ChangeNotifier {
     Function(Room room, EventsListener<RoomEvent> listener) onJoin,
   ) async {
     try {
+      
       final room = Room();
       joinLoading = true;
       final listener = room.createListener();
